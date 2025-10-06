@@ -1,0 +1,637 @@
+/* 基础大小 */
+html {
+  font-size: 62.5%;
+  align-items: center;
+}
+
+/* 元素样式 */
+body {
+  background: #dcd6e7;
+  padding-top: 0px!important;
+}
+
+/* 头部 */
+header {
+  position: fixed;
+  display: flex;
+  background: #6b5499;
+  color: #0cf5f5;
+  font-size: large;
+  font-weight: bolder;
+  width: 100%;
+  height: 3em;
+  top: 0;
+  left: 0;
+  line-height: 2em;
+  z-index: 999;
+}
+
+/* ===================== 顶部start =====================*/
+header > .left {
+  width : 60em;
+}
+
+header > .left > .cell {
+  margin-left: 1em;
+}
+
+header > div {
+  padding: 10px 0 0 10px;
+}
+/* 顶部右侧 */
+header > .right {
+  right: 5em;
+  position: relative;
+}
+
+/* 顶部右侧用户头像 */
+.icon {
+  background: rgb(135, 131, 168);
+  height: 2.5em;
+  width: 2.5em;
+  border-radius: 2em;
+  overflow: hidden;
+  position: fixed;
+  right: 100px;
+  z-index : 998
+}
+
+.icon > img {
+  width: 100%;
+  height: 100%;
+}
+
+/* 顶部右侧选项卡 */
+header > .right > .hidnMenu {
+  width : 300px;
+  display : none;
+  position: fixed;
+  right: 200px;
+}
+
+header > .right > .hidnMenu > .block {
+  background: #afafaf94;
+  margin-top: 20px;
+  color : black;
+  position: absolute;
+  right: -150px;
+}
+/* ===================== 顶部 end =====================*/
+
+/* 脚部 */
+footer {
+  position: fixed;
+  background: white;
+  color: #0cf5f5;
+  font-size: large;
+  width: 100%;
+  height: 3em;
+  bottom: 0;
+  left: 0;
+  z-index: 999;
+}
+
+/* 左侧导航 */
+.leftNav {
+  position: fixed;
+  left: 0px;
+  top: 5em;
+  background: #143e58;
+  width: 200px;
+  height: 100%;
+  z-index: 998;
+}
+
+/* 透明边框 */
+.alpha-board {
+  border: 10px solid hsla(0, 0%, 100%, .5);
+  border-radius: 5px;
+  background-clip: padding-box;
+  /* 背景去除边框的宽度 */
+  box-shadow: 0px 0px 3px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* ===================== 主窗体start=====================*/
+#app > .main {
+  margin-left: 20em;overflow-y: auto;overflow-x: hidden;padding-bottom: 50px;
+}
+
+main{
+}
+
+.block {
+  margin-right: 1em;
+  background: white;
+  border-radius: 10px;
+  float: left;
+  min-height : 5em;
+  padding-bottom: 15px;
+  text-align: center;
+}
+
+.main > .block > table {
+  width: 90%;
+  margin-left : 20px
+}
+
+.main > .block > p {
+  font-size: 20px;
+  color: red;
+}
+
+.doubleCol > .block {
+  min-width: 38em;
+  text-align: center;
+}
+
+.trubleCol > .block {
+  min-width: 37em;
+}
+
+/* 带图片的标题行 */
+.block-title {
+  position: relative;
+}
+
+.block-title > h2 > img {
+  margin-left : -25px;
+  width: 50px;
+  height: 50px;
+}
+
+.block-title > h2 > label {
+  position :absolute;
+  width : 300px;
+  top : 25px
+}
+/* ===================== 主窗体 end =====================*/
+
+/* ===================== 基础输入元素start=====================*/
+/* 输入框 */
+input[type='text'],
+input[type='password'],
+input[type='number'] {
+  height: 22px;
+  width: 140px;
+  border: 1px solid #949494;
+  border-radius: 5px;
+  font-family: ui-rounded;
+  max-width: 800px;
+  min-width: 100px;
+}
+
+input[type='date'],
+input[type='datetime-local']{
+  height: 25px;
+  width: 140px;
+  border: 1px solid #949494;
+  border-radius: 5px;
+  font-family: ui-rounded;
+}
+
+.dateTime {
+  height: 30px;
+  width: 180px;
+  border: 1px solid #949494;
+  border-radius: 5px;
+  font-family: ui-rounded;
+}
+
+textarea {
+  border: 1px solid #949494;
+  border-radius: 5px;
+  font-family: ui-rounded;
+  font-size: unset;
+}
+
+select {
+  height: 27px;
+  width: 145px;
+  border: 1px solid #949494;
+  border-radius: 5px;
+}
+
+a {
+  color: inherit;
+}
+
+/* ===================== 基础输入元素 end =====================*/
+
+/* ===================== 按钮start=====================*/
+/* 按钮 */
+button,
+input[type='button'] {
+  border: 1px solid #446d88;
+  border-radius: 6px;
+  background: linear-gradient(to bottom, #efeff34f, #0706f55e);
+  margin-right: 10px;
+  color: rgb(56, 49, 49);
+  font-size: 14px;
+  font-weight: bolder;
+  height:35px;
+}
+
+.weChatBtn {
+    border-radius: 5px;
+    background-color: rgb(239, 178, 87);
+    color: #302a2a;
+}
+
+button:hover,
+input[type='button']:hover {
+  color : white;
+  background: linear-gradient(to bottom, #0706f55e, #efeff34f);
+}
+
+.weChatBtn:hover {
+  background: rgb(255, 211, 146);
+}
+
+/* 图片按钮 */
+input[type='image'] {
+  transform: scale(0.9);
+}
+
+.animate{
+  animation: aniBtn 3s infinite;
+}
+
+/* 图片按钮-动画 */
+@keyframes aniBtn {
+  50% {
+    filter: opacity(0.5);
+  }
+
+  60% {
+    filter: opacity(0.6);
+  }
+
+  70% {
+    filter: opacity(0.7);
+  }
+
+  80% {
+    filter: opacity(0.8);
+  }
+
+  90% {
+    filter: opacity(0.9);
+  }
+
+  100% {
+    filter: opacity(1);
+  }
+}
+
+.imageBtn {
+  background: url(../images/btn_bottem.png)no-repeat;
+  background-size: 15rem 3rem;
+  width: 15rem;
+  height: 3rem;
+  float: left;
+  margin-left: 1rem;
+}
+
+.imageBtn span {
+  padding-left: 2.7rem;
+  font-size: 2rem;
+  color: white;
+}
+
+/* 悬停效果-放大 */
+.imageBtn:hover,
+input[type='image']:hover,
+.icon:hover {
+  transform: scale(1.1);
+}
+
+/* ===================== 按钮 end =====================*/
+
+/* ===================== table列表start=====================*/
+/* 列表 */
+thead {
+  background-color: #5252bdcf;
+  color: #f9eeee;
+}
+
+thead > tr > td {
+  text-align : center;
+}
+
+/* 排序列标题图标 */
+th > .orderIcon {
+  font-family: cursive;
+  color: #e3ff47;
+}
+
+/* 悬浮式样 */
+tbody>tr:hover{
+  background-color: rgb(159, 202, 240);
+}
+
+td {
+  border: 1px solid #949494;
+  border-collapse: collapse;
+  font-size: small;
+}
+
+td>button {
+  width: 40px;
+  height: 20px;
+  border-radius: 3px;
+  font-size: 10px;
+  color: black;
+  background-color: antiquewhite;
+  font-weight: normal;
+}
+
+.alt1 {
+  background-color: #d4e9ec
+}
+
+.alt2 {
+  background-color: white;
+}
+
+/* 盒子内横向排列 */
+.cell {
+  display: inline-block;
+  padding: 5px 5px 0 0;
+  text-align: center;
+}
+
+/* ===================== table列表 end =====================*/
+
+/* ===================== 菜单start=====================*/
+
+/* 左侧导航 */
+.leftMenu {
+  margin: 0px 0px 0px -40px;
+  font-size: 30px;
+  font-style: italic;
+  color: rgb(82 21 70);
+  background-color: #00c7c7;
+}
+
+.leftMenu>li {
+  font-size: large;
+  font-style: italic;
+  color: white;
+  padding-left: 30px;
+  list-style: none;
+  padding-top: 5px;
+  background-color: #727a7a;
+  border: 1px solid #959391;
+}
+
+.leftMenu>li:hover,
+.cell:hover {
+  /* transform: scale(1.1); 
+  background-color: #4fb6b6;*/
+  cursor: context-menu;
+}
+
+/* .leftMenu>li::before {
+  content : '';
+  display: inline-block;
+  background : url(../images/btn-back.png);
+  background-size: cover;
+  width : 20px;
+  height : 20px;
+} */
+
+/* ===================== 菜单 end =====================*/
+
+/* ===================== 输入区域行start=====================*/
+.inputRow {
+  display: flex;
+  padding-left: 20px;
+  flex-flow: row wrap;
+  margin-top: 10px;
+}
+
+/* 输入区域一行中单独元素 Div */
+.inputCell {
+  display: flex;
+  padding-top: 10px;
+  padding-right: 15px;
+}
+
+/* 输入元素的标题 label */
+.inputCell label {
+  display: block;
+  width: 160px;
+  color: #2f2f5cfc;
+  font-size: medium;
+  margin-top: 2.5px;
+  text-align: right;
+  padding-right: 15px;
+}
+
+.inputCell span {
+  font-size: 15px;
+  margin-top: 2px;
+}
+
+.nessary::after {
+  content : ' * ';
+  color: red;
+}
+
+/* 竖向排列 */
+.vertical .inputCell {
+  display: block;
+}
+
+/* 输入元素中央对齐 */
+.centerContent {
+  margin: 0 auto;
+}
+
+/* =====================  输入区域行end =====================*/
+
+/* 提示输入错误样式 */
+input[type='text'][class='error'],
+select[class='error'] {
+  border: 2px solid red;
+}
+
+/* radio,checkbox Label */
+.checkItem {
+  width: 150px;
+  display: inline-flex;
+}
+
+/* */
+#messageArea {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+}
+
+/* 居中窗口 */
+.centerWindow {
+  position: absolute;
+  background: #ffffff85;
+  display: grid;
+  border-radius: 25px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  place-items: center;
+}
+
+/* 居中靠上 */
+.centerTopWindow {
+  position: absolute;
+  background: #ffffff85;
+  border-radius: 25px;
+  left: 30%;
+  place-items: center;
+}
+
+/* =====================  多标签页面start =====================*/
+.group-layout {
+  padding-top: 10px;
+}
+
+/* 标签Title Div */
+.group-title {
+  display: flex;
+  text-align: center;
+}
+
+/* 标签对应显示区域Div */
+.group-section {
+  display: none;
+  border: 2px inset #c3baf9c7;
+  background-color: #FFFFFF;
+  width: 90%;
+}
+
+/* 标签对应显示区域标题SPAN */
+.layout-title {
+  float: left;
+  width: 180px;
+  color: #006BBD;
+  background-color: #E3E5E7;
+  border-left: 1px solid #CCCCCC;
+  border-right: 1px solid #CCCCCC;
+  border-top: 1px solid #CCCCCC;
+}
+
+/* 选中的标签 */
+.current-layout {
+  border-bottom: 3px solid #0062E6;
+  background-color: #FFFFFF;
+}
+
+/* ===================== 多标签页面 end =====================*/
+
+/* ===================== Dialog start =====================*/
+/* pop up */
+#dialog {
+  display: none;
+}
+
+#dialogWindow {
+  height: 370px;
+  width: 700px;
+  position: absolute;
+  border-radius: 10px;
+  background-color: #e0edf5;
+  left: 25%;
+  top: 25%;
+  overflow-x: hidden;
+  z-index: 1001;
+}
+
+#grayup {
+  top: 0px;
+  height: 0px;
+  margin-left: -10px;
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  background-color: rgb(128, 128, 128, 0.8);
+  z-index: 1000;
+}
+
+#dialogWindow > .dialogCntr {
+  height:30px;float:right;padding-top:5px
+}
+
+#dialogWindow > #content {
+  overflow-y: scroll;
+  margin-top: 45px;
+  width: 103%;
+  height: 80%;
+  color: red;
+}
+
+.closeBtn {
+  width:30px;height:30px;border-radius: 15px;font-size: 25px;
+}
+
+/* ===================== Dialog end =====================*/
+
+/* 自定义检索框样式 */
+.btnSearchItem input {
+  height: 30px;
+  border-radius: 15px;
+}
+
+.btnSearchItem button {
+  background-color: #9d9dfd;
+  height: 34px;
+  border-radius: 0px 17px 17px 0px;
+  margin-left: -100px;
+  border: 1px solid #949494;
+  padding-top: 2px;
+}
+
+/* 分割线 */
+hr {
+  border: 0;
+  height: 2px;
+  background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgb(121 133 187), rgba(0, 0, 0, 0));
+  margin-top: 20px;
+}
+
+/* ===================== 标签tag =====================*/
+.inputTag{
+    align-items:center;
+    display:flex;
+    flex-wrap:wrap;
+    width:500px;
+    position:relative;
+}
+ .tagListDiv {
+    display:flex
+}
+ .tagDiv{
+    border:1px solid black;
+    border-radius:5px;
+    background-color:#00a1d6;
+    height:25px;
+    margin-left:5px;
+    align-items:center;
+    display:flex
+}
+ .tagDiv > p {
+    font-size: medium;
+    color:white;
+    margin-left:10px
+}
+ .tagDiv > span {
+    margin-left:10px;
+    margin-right:10px;
+    padding-bottom: 5px;
+}
+ .inputDiv{
+    margin-left:10px;
+    position:absolute;
+    right:0px
+}
+
+/* ===================== Dia标签tag end =====================*/

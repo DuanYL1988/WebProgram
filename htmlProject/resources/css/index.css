@@ -1,0 +1,47 @@
+.appInfo {
+  width: 70%;
+  font-size: 2.5em;
+  position: absolute;
+}
+
+.hidnMenu {
+  width: 5em;
+  height: 6em;
+} 
+
+.appCell {
+  margin-top: 10px;
+  border-radius: 1em;
+}
+
+.appCell>div {
+  display: inline-block;
+}
+
+.appCell:hover {
+  background: rgb(59, 59, 59);
+  color: white;
+}
+
+.down {
+  font-size: 20px;
+  margin-left : 10px;
+}
+
+.ul-link {
+  display : inline;
+  padding : 0;
+  color :rgb(191, 212, 185);
+}
+
+ul > li {
+  list-style : none;
+}
+
+.ul-link > li::after {
+  content : "|";
+}
+
+.active {
+  margin-top: 10px;
+}

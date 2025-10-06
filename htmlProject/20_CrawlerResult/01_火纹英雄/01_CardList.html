@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="../../resources/images/feh/PageIcon.png">
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <link rel="stylesheet" href="../../resources/common/vue_common.css" />
+    <link rel="stylesheet" href="./cardList.css" />
+    <link rel="stylesheet" href="./singleHero.css" />
+    <style>
+    </style>
+    <script src="../../resources/lib/jquery-3.4.1.min.js"></script>
+    <script src="../../resources/common/vue_common.js"></script>
+    <script src="https://unpkg.com/vue@2/dist/vue.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script src="./CodeMaster.json"></script>
+    <script src="./CrawlerResult.json"></script>
+    <script src="./SkillMaster.json"></script>
+    <script>
+        const IMG_HOST = "https://static.wikia.nocookie.net/feheroes_gamepedia_en/images/"
+        function getMasterInfo(data, column, kbn, skillKbn) {
+            let key = data[column]
+            let masterInfo = null
+            if ("codeMaster" == kbn) {
+                masterInfo = CODE_MASTER[key]
+            } else if ("skillMaster" == kbn) {
+                let preStr = "FE_SKILL_" + skillKbn.toUpperCase() + "_" + key
+                if ("WEAPON" == skillKbn.toUpperCase()) {
+                    preStr = "FE_WEAPON_" + key
+                }
+                masterInfo = SKILL_MASTER[preStr]
+            }
+            if (isNotEmpty(key) && isNotEmpty(masterInfo)) {
+                data[column] = (isNotEmpty(masterInfo.name)) ? masterInfo.name : data[column]
+                if (isNotEmpty(masterInfo.imgUrl)) {
+                    data[column + "Icon"] = IMG_HOST + masterInfo.imgUrl
+                }
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <div id="app">
+        <div class="searchArea" style="margin-left:20px">
+            <el-select size="small" v-model="condition.name">
+                <el-option v-for="item in nameList" :label="item.cn" :value="item.code" :key="item.code">{{item.cn}}</el-option>
+            </el-select>
+        </div>
+        <!-- 头像Card -->
+        <div class="cardList" style="padding-top: 10px">
+            <div v-for="data in dataList" class="card" @click="pickData(data)">
+                <table>
+                    <tr>
+                        <td class="faceImg" rowspan="4">
+                            <img :src="IMG_HOST + data.faceImg + data.imgName.replace(/'/g,'') + '_Face_FC.webp'"></img>
+                            <div class="rarity">
+                                <img class="rarityStar" v-for="n in parseInt(data.rarity)"
+                                    :src="`../../resources/images/feh/Icon_Rarity_`+data.rarity+`.png`">
+                            </div>
+                        </td>
+                        <td class="infoStr" colspan="5">
+                            <div class="title">{{data.titleName + ":" + data.nameCn}}</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="infoStr " style="font-size:17px;font-style: italic;color: rgb(39 45 76);;"
+                            colspan="5">
+                            <img class="iconTdImg" :src="data['weaponTypeIcon']" />
+                            <span>{{data.weapon}} [{{data.weaponType}}]</span>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="infoStr" style="font-size: 17px;" colspan="5"><img class="iconTdImg"
+                                :src="data.entryIcon"></img><span>{{data.entry}}</span></td>
+                    </tr>
+                    <tr>
+                        <td class="infoStr">HP:{{data.hp}}</td>
+                        <td class="infoStr">POW:{{data.atk}}</td>
+                        <td class="infoStr">SPD:{{data.spd}}</td>
+                        <td class="infoStr">DEF:{{data.def}}</td>
+                        <td class="infoStr">RES:{{data.res}}</td>
+                    </tr>
+                    <tr>
+                        <td class="infoStr" colspan="2">
+                            <!-- v-if="``!=data.skillAIcon && null != data.skillAIcon" -->
+                            <img class="iconTdImg" :src="data['skillAIcon']"></img><span>{{data.skillA}}</span>
+                        </td>
+                        <td class="infoStr" colspan="2">
+                            <img class="iconTdImg" :src="data['skillBIcon']"></img><span>{{data.skillB}}</span>
+                        </td>
+                        <td class="infoStr" colspan="2">
+                            <img class="iconTdImg" :src="data['skillCIcon']"></img><span>{{data.skillC}}</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">
+                            <img class="infoStr" src="../../resources/images/feh/Icon_Skill_Assist.png" />
+                            <span>{{data.skillAss}}</span>
+                        </td>
+                        <td colspan="3">
+                            <img class="infoStr" src="../../resources/images/feh/Icon_Skill_Special.png" />
+                            <span>{{data.skillSp}}</span>
+                        </td>
+                    </tr>
+                </table>
+
+            </div>
+        </div>
+
+        <!-- 详细dialog -->
+        <el-dialog :visible.sync="openDialogFlag" title="火纹英雄立绘" alt="Click" top="10px" width="900px">
+            <div id='activity' style='background:url(../../resources/images/backgound_v.jpg)no-repeat;height: 70rem;'>
+                <div id='sameHero'></div>
+                <div id='heroIllustration'>
+                  <img v-if="openDialogFlag" :src="selectedData.stageImg[0]"/>
+                </div>
+                <!-- 面板 -->
+                <div id='heroStatusArea' style='display:null'>
+                  <!-- 称号 名称 -->
+                  <div id='titleArea'>
+                    <label id="titleName">{{selectedData.titleName}}</label>
+                    <label id="name">{{selectedData.nameCn}}</label>
+                  </div>
+                  
+                  <!-- 属性 -->
+                  <div class="textArea" style="margin-left: 7rem;">
+                      <div class="leftText" style="width:200px;display:inline-block">
+                          <div class="statusAndSkillRow">
+                            <label class="value" id="hp">29</label>
+                          </div>
+                          <div class="statusAndSkillRow">
+                            <label class="value" id="attact">29</label>
+                          </div>
+                          <div class="statusAndSkillRow">
+                            <label class="value" id="speed">29</label>
+                          </div>
+                          <div class="statusAndSkillRow">
+                            <label class="value" id="def">29</label>
+                          </div>
+                          <div class="statusAndSkillRow">
+                            <label class="value" id="mdf">29</label>
+                          </div>
+                          <div class="statusAndSkillRow">
+                            <label class="value" id="">9999</label>
+                          </div>
+                          <div class="statusAndSkillRow">
+                            <label class="value" id="">6000</label>
+                          </div>
+                      </div>
+                      
+                      <div class="rightText" style="width:200px;display:inline-block">
+                          <div class="statusAndSkillRow">
+                            <label class="value" id="weapon">武器</label>
+                          </div>
+                          <div class="statusAndSkillRow">
+                            <label class="value" id="skillS">辅助技能</label>
+                          </div>
+                          <div class="statusAndSkillRow">
+                            <label class="value" id="skillE">必杀技能</label>
+                          </div>
+                          <div class="statusAndSkillRow">
+                            <label class="value" id="skillA">被动技能1</label>
+                          </div>
+                          <div class="statusAndSkillRow">
+                            <label class="value" id="skillB">被动技能1</label>
+                          </div>
+                          <div class="statusAndSkillRow">
+                            <label class="value" id="skillC">被动技能1</label>
+                          </div>
+                          <div class="statusAndSkillRow">
+                            <label class="value" id="skillD">被动技能1</label>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+            </div>
+        </el-dialog>
+    </div>
+
+    <!-- Vue Js -->
+    <script>
+        new Vue({
+            el: '#app',
+            data: function () {
+                return {
+                    BASE_IMG_DIR: "../resources/00_illustration/01_feh/"
+                    , IMG_HOST: "https://static.wikia.nocookie.net/feheroes_gamepedia_en/images/"
+                    , BASE_HREF: "https://feheroes.fandom.com/wiki/"
+                    , dataList: []
+                    , condition: {
+                        "name": "Lyn"
+                    }
+                    , nameList: {}
+                    , selectedData: {}
+                    , openDialogFlag: false
+                }
+            },
+            // 編集用データ
+            computed: {
+            },
+            // 初期化処理
+            mounted() {
+                this.dataList = this.getDataList()
+            },
+            // 监听
+            watch: {
+                condition: {
+                    handler(newVal, oldVal) {
+                        this.dataList = this.getDataList()
+                    },
+                    deep: true
+                }
+            },
+            //
+            methods: {
+                getDataList: function () {
+                    resultList = []
+                    $.each(DATA_LIST, (index, data) => {
+                        if (data.name == this.condition.name) {
+                            // 
+                            getMasterInfo(data, "entry", "codeMaster", "")
+                            getMasterInfo(data, "weaponType", "codeMaster", "")
+                            getMasterInfo(data, "skillA", "skillMaster", "A")
+                            getMasterInfo(data, "skillB", "skillMaster", "B")
+                            getMasterInfo(data, "skillC", "skillMaster", "C")
+                            getMasterInfo(data, "skillAss", "skillMaster", "ass")
+                            getMasterInfo(data, "skillSp", "skillMaster", "sp")
+                            getMasterInfo(data, "weapon", "skillMaster", "weapon")
+                            resultList.push(data)
+                        }
+                        this.nameList[data.name] = { "code": data.name, "cn": data.nameCn, "jp": data.nameJp }
+                    })
+                    return resultList
+                },
+                pickData(data) {
+                    this.selectedData = copyObject(data)
+                    this.selectedData.stageImg[0] = this.IMG_HOST + data.stageImg[0] + data.imgName + "_Face.webp"
+                    this.selectedData.stageImg[1] = this.IMG_HOST + data.stageImg[1] + data.imgName + "_BtlFace.webp"
+                    this.selectedData.stageImg[2] = this.IMG_HOST + data.stageImg[2] + data.imgName + "_BtlFace_C.webp"
+                    this.selectedData.stageImg[3] = this.IMG_HOST + data.stageImg[3] + data.imgName + "_BtlFace_D.webp"
+                    this.openDialogFlag = true
+                },
+                showMsg(messageStr) {
+                    this.$notify.info({
+                        title: '消息',
+                        message: JSON.stringify(messageStr)
+                    })
+                },
+            }
+        })
+    </script>
+</body>
+
+</html>

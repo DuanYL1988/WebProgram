@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Fate/Grand Order</title>
+    <link href="../resources/common/common.css" rel="stylesheet" />
+    <link href="../resources/css/illustration.css" rel="stylesheet" />
+    <script src="../resources/lib/jquery-3.4.1.min.js"></script>
+    <script src="../resources/common/commonService.js"></script>
+    <script src="../resources/common/webSql.js"></script>
+    <script src="../resources/js/illustration.js"></script>
+    <script src="servant.js"></script>
+  </head>
+
+  <body>
+    <main>
+      <div>
+        <!-- 检索区 -->
+        <div id="btnSearchItem" style="left: 15rem;">
+          <input id="searchTxt" type="text" oninput="fifterResult(this)" />
+          <div id="resultArea" style="display: none;"></div>
+        </div>
+        <!-- 设置 -->
+        <div id="setUp" style="" onclick="javascript:showSetup()">
+          <img src="../resources/images/setup.jpeg" width="30px" height="30px" />
+        </div>
+      </div>
+
+      <!-- 主页面 -->
+      <div id="activity" style="width: 600px; height: 750px;">
+        <!-- 立绘切换icon -->
+        <div id="bottomBtnArea" style="top: 70rem; left: 20rem;">
+          <ul>
+            <li class="li-active" onclick="setIllustration(0,this)"></li>
+            <li onclick="setIllustration(1,this)"></li>
+            <li onclick="setIllustration(2,this)"></li>
+            <li onclick="setIllustration(3,this)"></li>
+          </ul>
+        </div>
+      </div>
+
+      <div id="setupDiv" style="display:none ; width: 500px; background-color: #4e4949cc; position: fixed; left: 30px; bottom: 5px;">
+        <div id="displayArea" class="line-block">
+          <label>立绘宽度</label>
+          <input type="number" name="imageWidth" style="width: 50px;" />
+
+          <label>立绘高度</label>
+          <input type="number" name="imageheight" style="width: 50px;" />
+
+          <label>检索框隐藏高度</label>
+          <input type="number" name="serachTxtHidnHeight" style="width: 50px;" />
+        </div>
+
+        <div>
+          <button type="button"  onclick="setPageStyle()" style="float : right;">适用</button>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

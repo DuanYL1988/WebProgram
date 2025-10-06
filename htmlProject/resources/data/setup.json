@@ -1,0 +1,43 @@
+const roles = ["administrator","developer","tester","client"];
+
+const userList = [
+    {"id":"Lin_F_Valentine18","name":"琳迪斯(FE-管理员,开发)","imgPath":"feh","groups":{"FIREEMBLEM":["administrator","developer"]}},
+    {"id":"Camilla_F_LightOfNohr","name":"卡米拉(FE-开发)","imgPath":"feh","groups":{"FIREEMBLEM":["developer"]}},
+    {"id":"Lucina_F_GloriousArcher","name":"露琪娜(FE-测试)","imgPath":"feh","groups":{"FIREEMBLEM":["tester"]}},
+    {"id":"Aqua_F_Legend","name":"阿库亚(FE-客户)","imgPath":"feh","groups":{"FIREEMBLEM":["client"]}},
+    {"id":"Ike_M_Venlent","name":"艾克(FE-管理员)","imgPath":"feh","groups":{"FIREEMBLEM":["administrator"]}},
+    {"id":"Artoria_Lancer","name":"阿尔托莉雅(fgo-管理员,开发)","imgPath":"fgo","groups":{"FGO":["administrator","developer"]}},
+    {"id":"Ishtar","name":"伊斯塔尔(fgo-开发)","imgPath":"fgo","groups":{"FGO":["developer"]}},
+    {"id":"Jeanned'Arc_Archer","name":"贞德(fgo-测试)","imgPath":"fgo","groups":{"FGO":["tester"]}},
+    {"id":"Morgan","name":"摩根(fgo-客户)","imgPath":"fgo","groups":{"FGO":["client"]}},
+    {"id":"Kama_Avenger","name":"伽摩(fgo-管理员)","imgPath":"fgo","groups":{"FGO":["administrator"]}},
+    {"id":"183","name":"雅典娜(honor-管理员)","imgPath":"honorKing","groups":{"HONOR":["administrator"]}},
+    {"id":"Ishtar_F_ThunderGoddess","name":"DuanYL(VIP)","imgPath":"feh","groups":{"MAIN":["administrator"],"FIREEMBLEM":["administrator"],"FGO":["developer"]}}
+];
+
+const menuList = [
+  {"CATEGOLY":"backlog","SUBCATEGOLY":"top","NAME":"仪表盘","URL":"","LOCATION":"","APPLICATION":"COMMON","ROLE":"","SORT":""},
+  {"CATEGOLY":"backlog","SUBCATEGOLY":"top","NAME":"工程","URL":"","LOCATION":"","APPLICATION":"COMMON","ROLE":"","SORT":""},
+  {"CATEGOLY":"backlog","SUBCATEGOLY":"left","NAME":"数据管理","URL":"dbManagement.html","LOCATION":"","APPLICATION":"MAIN","ROLE":"administrator","SORT":""},
+  {"CATEGOLY":"backlog","SUBCATEGOLY":"left","NAME":"火纹英雄","URL":"feh/index.html","LOCATION":"","APPLICATION":"FIREEMBLEM","ROLE":"administrator,developer,tester,client","SORT":""},
+  {"CATEGOLY":"backlog","SUBCATEGOLY":"left","NAME":"追加英雄","URL":"feh/add.html","LOCATION":"","APPLICATION":"FIREEMBLEM","ROLE":"administrator,developer","SORT":""},
+  {"CATEGOLY":"backlog","SUBCATEGOLY":"left","NAME":"Fate/GrandOrder","URL":"fgo/index.html","LOCATION":"","APPLICATION":"FGO","ROLE":"administrator,developer,tester,client","SORT":""},
+  {"CATEGOLY":"backlog","SUBCATEGOLY":"left","NAME":"追加英灵","URL":"fgo/add.html","LOCATION":"","APPLICATION":"FGO","ROLE":"administrator,developer","SORT":""},
+  {"CATEGOLY":"backlog","SUBCATEGOLY":"left","NAME":"王者荣耀","URL":"honorKing/index.html","LOCATION":"","APPLICATION":"HONOR","ROLE":"administrator","SORT":""},
+  {"CATEGOLY":"backlog","SUBCATEGOLY":"left","NAME":"VUE","URL":"vue/index.html","LOCATION":"","APPLICATION":"VUE","ROLE":"developer,tester","SORT":""},
+  {"CATEGOLY":"backlog","SUBCATEGOLY":"left","NAME":"算法","URL":"algorithm.html","LOCATION":"","APPLICATION":"MAIN","ROLE":"administrator","SORT":""},
+  {"CATEGOLY":"backlog","SUBCATEGOLY":"left","NAME":"公司首页","URL":"company.html","LOCATION":"","APPLICATION":"MAIN","ROLE":"client","SORT":""},
+  {"CATEGOLY":"backlog","SUBCATEGOLY":"left","NAME":"收支","URL":"expend.html","LOCATION":"","APPLICATION":"MAIN","ROLE":"administrator","SORT":""},
+  {"CATEGOLY":"backlog","SUBCATEGOLY":"left","NAME":"导航","URL":"subWay.html","LOCATION":"","APPLICATION":"MAIN","ROLE":"developer","SORT":""},
+  {"CATEGOLY":"FIREEMBLEM","SUBCATEGOLY":"link","NAME":"一览","URL":"feh/index.html","LOCATION":"","APPLICATION":"FIREEMBLEM","ROLE":"administrator,tester","SORT":""},
+  {"CATEGOLY":"FIREEMBLEM","SUBCATEGOLY":"link","NAME":"追加","URL":"feh/add.html","LOCATION":"","APPLICATION":"FIREEMBLEM","ROLE":"administrator,developer","SORT":""},
+  {"CATEGOLY":"FGO","SUBCATEGOLY":"link","NAME":"一览","URL":"feh/index.html","LOCATION":"","APPLICATION":"FGO","ROLE":"administrator,tester","SORT":""},
+  {"CATEGOLY":"FGO","SUBCATEGOLY":"link","NAME":"追加","URL":"feh/add.html","LOCATION":"","APPLICATION":"FGO","ROLE":"administrator,developer","SORT":""}
+];
+
+const applicationInfo = {
+  "FIREEMBLEM" : {"icon" : "icon_feh.png","location" : "feh","name":"火纹英雄"},
+  "FGO" : {"icon" : "icon_fgo.png","location" : "fgo","name":"命运/冠位指定"},
+  "VUE" : {"icon" : "vue.png","location" : "vue","name":"VUE3"},
+  "ANGULAR" : {"icon" : "angular.png","location" : "angularue","name":"ANGULAR"}
+};

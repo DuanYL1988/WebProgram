@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ja_jp" dir="ltr">
+  <head>
+  <meta charset="SJIS">
+  <meta name="viewport" content="width=device-width">
+  <link rel="stylesheet" href="../resources/common/common.css" />
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <style>
+    .block{width:50px;height:50px;border-radius:10px;margin: 0 5 5 0;display: inline-block;text-align:center;line-height:50px;color:white}
+    .bkgreen{background-color:green}
+    .bkblue{background-color:blue}
+    .bkred{background-color:red}
+    .click{background-color:yellow}
+    .fontblack{color:black}
+    
+    button{width:100px;height:30px;border:3px;border-radius:10px;background-color:#f3f0f0}
+  </style>
+  
+  <script>
+    const blockCnt = 90
+    const colorArr = ["bkgreen","bkblue","bkred"]
+    var result = []
+	var maxRowNo = 0
+	var maxColNo = 15
+	var clickCnt = 0
+	var clickId = ""
+    
+    /**
+     * 初期化処理
+     */
+    function initializePage(){
+      let index_block = 0
+      let index_color = 0
+      let boxEle = document.getElementById("divBox")
+      boxEle.innerHTML = ""
+      for(index_block; index_block<blockCnt ; index_block++) {
+        let divEle = document.createElement("div")
+        divEle.className = "block " + colorArr[index_color];
+        divEle.innerHTML = index_block
+        divEle.addEventListener('click',getInnerNumber,false)
+        if(index_color<colorArr.length-1){
+          index_color++
+        } else {
+          index_color = 0
+        }
+        boxEle.appendChild(divEle)
+      }
+	  //
+	  randomSort()
+	  sameColor()
+	  //cellDrop()
+    }
+    
+    /**
+     * 排列ランダム変換
+     */
+    function randomSort(){
+      let boxEle = document.getElementById("divBox")
+      let blockDivArr = transObjToArray(document.getElementsByClassName("block"))
+      let arrCnt = blockDivArr.length
+      let index_n = 0
+      let indexRow = 0
+      let indexCol = 0
+      let rowArr = []
+      boxEle.innerHTML = ""
+      while(index_n < arrCnt) {
+        let randomIndex = getRandomCnt(blockDivArr.length)
+        let randomEle = blockDivArr[randomIndex]
+        // 元素に行列番号付き
+        randomEle.id = indexRow + '-' + indexCol
+        // 対応した色と数字対象作成
+        rowArr.push({'num':randomEle.innerHTML,'color':randomEle.className.replace('block ','')})
+        
+        indexCol++
+        if(indexCol >= maxColNo) {
+          result.push(rowArr)
+          rowArr = []
+          indexRow++
+          indexCol=0
+        }
+        boxEle.appendChild(randomEle)
+        blockDivArr.splice(randomIndex,1)
+        index_n++
+      }
+      //
+      if (rowArr.length > 0) {
+        result.push(rowArr)
+      }
+	  maxRowNo = indexRow - 1
+    }
+    
+	/**
+	 * 隣３セール同じ色場合、消します
+	 */
+    function sameColor(){
+      // 元素ループ
+      for(let row=0;row<result.length;row++){
+        for(let col=0;col<result[row].length;col++){
+          // 色判断ー行
+          if(col < result[row].length -2) {
+            if(result[row][col].color === result[row][col+1].color && result[row][col].color === result[row][col+2].color) {
+              document.getElementById(row + "-" + col).className = "block fontblack"
+              document.getElementById(row + "-" + (parseInt(col)+1)).className = "block fontblack"
+              document.getElementById(row + "-" + (parseInt(col)+2)).className = "block fontblack"
+			  document.getElementById(row + "-" + col).innerHTML = "　"
+              document.getElementById(row + "-" + (parseInt(col)+1)).innerHTML = "　"
+              document.getElementById(row + "-" + (parseInt(col)+2)).innerHTML = "　"
+            }
+          }
+          // 色判断ー列
+          if(row < result.length -2) {
+            if(result[row][col].color === result[row+1][col].color && result[row][col].color === result[row+2][col].color) {
+              document.getElementById(row + "-" + col).className = "block fontblack"
+              document.getElementById((parseInt(row)+1) + "-" + col).className = "block fontblack"
+              document.getElementById((parseInt(row)+2) + "-" + col).className = "block fontblack"
+			  document.getElementById(row + "-" + col).innerHTML = "　"
+              document.getElementById((parseInt(row)+1) + "-" + col).innerHTML = "　"
+              document.getElementById((parseInt(row)+2) + "-" + col).innerHTML = "　"
+            }
+          }
+        }
+      }
+    }
+	
+	function cellDrop(){
+		// 行ループ
+		for(let row=maxRowNo;row>0;row--) {
+			// 列ループ
+			for(let col=0;col<maxColNo;col++) {
+				let cellDivEle = document.getElementById(row + "-" + col)
+				
+				// 空白セール場合
+				if("block fontblack" == cellDivEle.className) {
+				console.log(cellDivEle.id)
+					// 上方向非空白セーブ移動
+					let loopFlag = true
+					let rowStep = 1
+					while(loopFlag && (row - rowStep)>=0) {
+						// 上セール取得
+						let upRowNo = row - rowStep
+						let upCellEle = document.getElementById(upRowNo + "-" + col)
+						console.log(upCellEle.id)
+						if("block fontblack" != upCellEle.className) {
+							console.log(upCellEle.id)
+							// セール入れ替え
+							cellDivEle.className = upCellEle.className
+							cellDivEle.innerHTML = upCellEle.innerHTML
+							upCellEle.className = "block fontblack"
+							upCellEle.innerHTML = "　"
+							loopFlag = false
+						} 
+						rowStep++
+					}
+				}
+			}
+		}
+	}
+    
+    function getInnerNumber(){
+        //同じセールクリック判定
+		if(this.className.indexOf(" click") > 0) {
+			// クリック取り消し
+			this.className = this.className.replace(" click","")
+			return
+		}
+		//一回クリック
+		if(clickCnt==0) {
+			this.className += " click"
+			clickCnt = 1
+			clickId = this.id
+			
+		//二回クリック
+		} else if(clickCnt==1) {
+			// 2回クリックセール比較
+			let clickRow = this.id.split("-")[0]
+			let clickCol = this.id.split("-")[1]
+			let befClickRow = clickId.split("-")[0]
+			let befClickCol = clickId.split("-")[1]
+			// 交換FLAG
+			let changeFlag = false
+			// 同じ行
+			if(clickRow == befClickRow) {
+				let step = Math.abs(clickCol - befClickCol)
+				changeFlag = (step == 1) ? true : false
+			// 同じ列
+			} else if(clickCol == befClickCol) {
+				let step = Math.abs(clickRow - befClickRow)
+				changeFlag = (step == 1) ? true : false
+			}
+			
+			if(!changeFlag) {
+				alert("please select adjacent cell!")
+			} else {
+			
+			}
+			
+			
+		}
+		
+    }
+    
+    /**
+     * 0-maxNumランダム数取得
+     */
+    function getRandomCnt(maxNum){
+      return Math.floor(Math.random() * maxNum)
+    }
+    
+    /**
+     * typeofがobjectの配列をarrayに変換
+     */
+    function transObjToArray(obj){
+      let arr = []
+      for(let i=0 ;i<obj.length; i++) {
+        arr.push(obj[i])
+      }
+      return arr
+    }
+  </script>
+
+  </head>
+
+  <body onload="initializePage()">
+    <div id="divBox" class="box" style="width:750px"></div>
+
+    <button type="button" onclick="randomSort()">random</button>
+    <button type="button" onclick="initializePage()">reset</button>
+    <button type="button" onclick="sameColor()">sameColor</button>
+    <button type="button" onclick="cellDrop()">cellDrop</button>
+  </body>
+</html>

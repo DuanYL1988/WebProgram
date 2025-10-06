@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>数据管理</title>
+        <link rel="icon" href="../resources/images/icon_dbm.png"/>
+		<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css" />
+		<link rel="stylesheet" href="../resources/common/vue_common.css" />
+		<style>
+        .searchArea>.cell{display:inline-block;margin: 10px 0 0 15px;}
+        .texareaHeight {height:265px}
+		</style>
+		<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+		<script src="../resources/common/vue_common.js"></script>
+		<script src="mantainsService.js"></script>
+        <script src="../resources/common/indexDB.js"></script>
+		<script src="../resources/data/tableData.json"></script>
+		<script src="https://unpkg.com/vue@2/dist/vue.js"></script>
+		<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+        <script>
+            const idKeyMap = {"FIREEMBLEM_HERO" : "imgName"}
+            const sortMap = {"FIREEMBLEM_HERO" : "releaseDate"}
+        </script>
+	</head>
+
+	<body>
+		<div id="app">
+            <!--  -->
+            <div class="searchArea" :style="tableWidth">
+                <div>
+                    <el-select v-model="tableName" style="width:220px!important">
+                        <el-option v-for="dbnm in dbTables" :value="dbnm">{{dbnm}}</el-option>
+                    </el-select>
+                    <el-button type="primary" @click="setLocalStageProp()">设置初始表</el-button>
+                </div>
+                <div class="cell" v-for="column in tableColumns" v-if="'●'==column.fifterable">
+                    <span>{{column.name}}</span>
+                    <el-select v-if="'select'==column.inputType"  v-model="condition[column.propertyName]">
+                        <el-option value=""></el-option>
+                        <el-option v-for="master in codeList" v-if="column.code==master.application + '_' +master.categoryId" :value="master.code">{{master.name}}</el-option>
+                    </el-select>
+                    <el-radio-group  v-else-if="'radio'==column.inputType"  v-model="condition[column.propertyName]">
+                        <el-radio-button label="">空白</el-radio-button>
+                        <el-radio-button v-for="master in codeList" v-if="column.code==master.application + '_' +master.categoryId" :label="master.code" >{{master.name}}</el-radio-button>
+                    </el-radio-group>
+                    <el-switch v-else-if="'flag'==column.inputType" v-model="condition[column.propertyName]" active-value="1" inactive-value="0"></el-switch>
+                    <el-input v-else :style="'width:' + column.listLength + 'px'" v-model="condition[column.propertyName]"></el-input>
+                </div>
+                <div class="cell">
+                    <!-- <el-switch v-model="localFlag" active-value="1" inactive-value="0"></el-switch> -->
+                </div>
+                <el-button style="margin-left:20px" type="primary" @click="cleanCondition()" >Clean</el-button>
+            </div>
+            
+			<!-- 一览列表TableList -->
+			<div id="jsonTable" v-if="tableColumns.length>0" class="block">
+				<el-table height="630" :style="tableWidth":data="tableList" border >
+                    <!-- 特定表的头像固定字段1 -->
+                    <el-table-column v-if="'FIREEMBLEM_HERO' === tableName" :width="faceColumnWidth" fixed="left" label="头像">
+                        <template slot-scope="scope">
+                            <div @click="condition.name = scope.row.name">
+                                <el-avatar :size="50" :src="`https://static.wikia.nocookie.net/feheroes_gamepedia_en/images/` + scope.row.faceImgUrl.replace(`{key}`,scope.row.imgName + `_Face_FC.webp`)"></el-avatar>
+                            </div>
+                        </template>
+                    </el-table-column>
+                    <el-table-column v-if="'FGO_SERVANT' === tableName" :width="faceColumnWidth" fixed="left" label="头像">
+                        <template slot-scope="scope">
+                            <div @click="condition.name = scope.row.name">
+                                <el-avatar :size="50" :src="scope.row.faceImgUrl"></el-avatar>
+                            </div>
+                        </template>
+                    </el-table-column>
+                    <!-- 特定表的头像固定字段2 -->
+                    <el-table-column v-if="'HONOR_KINGS' === tableName" :width="faceColumnWidth" fixed="left" label="头像">
+                        <template slot-scope="scope">
+                            <el-avatar :size="50" :src="getHonorFace(scope.row)"></el-avatar>
+                        </template>
+                    </el-table-column>
+                    
+                    <!-- 通用一览表示 -->
+					<template v-for="column in tableColumns">
+                        <el-table-column v-if="'●'==column.listVisable" :prop="column.propertyName" :label="column.name" :width="column.listLength">
+                            <template slot-scope="scope">
+                                <!-- 可编辑 -->
+                                <template v-if="'●'==column.disabled">
+                                    <el-select v-if="'select'==column.inputType || 'radio'==column.inputType" v-model="scope.row[column.propertyName]">
+                                        <el-option v-for="master in codeList" v-if="column.code==master.application + '_' +master.categoryId" :value="master.code">{{master.name}}</el-option>
+                                    </el-select>
+                                    <el-switch v-else-if="'flag'==column.inputType" v-model="scope.row[column.propertyName]" active-value="1" inactive-value="0" @change="changeStatus(scope.row)"></el-switch>
+                                    <el-input v-else v-model="scope.row[column.propertyName]"></el-input>
+                                </template>
+                                <!-- 只读 -->
+                                <template v-else>
+                                    <div v-if="'select'==column.inputType || 'radio'==column.inputType">{{getCodeName(scope.row,column)}}</div>
+                                    <div v-else style="overflow:hidden;height:20px">{{scope.row[column.propertyName]}}</div>
+                                </template>
+                            </template>
+                        </el-table-column>
+					</template>
+                    <el-table-column v-if="true" width="150" fixed="right" label="操作">
+                        <template #default="scope">
+                            <el-button type="primary" icon="el-icon-edit" size="mini" circle @click="editRow(scope.row)"></el-button>
+                            <el-button type="warning" icon="el-icon-document-copy" size="mini" circle @click="copyRow(scope.row)"></el-button>
+                            
+                            <template>
+                                <el-popconfirm
+                                confirm-button-text='确定'
+                                cancel-button-text='取消'
+                                icon="el-icon-info"
+                                icon-color="red"
+                                title="确定删除这条数据吗？"
+                                @confirm="deleteRow(scope.row,scope.$index)"
+                                >
+                                <!-- <el-button slot="reference">删除</el-button> -->
+                                <el-button type="danger" slot="reference" icon="el-icon-delete" size="mini" circle></el-button>
+                                </el-popconfirm>
+                            </template>
+                        </template>
+                    </el-table-column>
+				</el-table>
+                <!-- 分页组件 -->
+				<div class="block">
+                    <el-pagination background
+					layout="prev, pager, next, jumper, total, sizes"
+                    @size-change="handleSizeChange"
+                    @current-change="handleCurrentChange"
+                    :current-page="listProp.pageNo"
+                    :page-size="listProp.pageSize"
+                    :page-sizes="[listProp.pageSize, 5, 7, 10, 15, 20, 500]"
+					:total="dataList.length" >
+                    </el-pagination>
+				</div>
+                <!-- edit detail -->
+                <el-dialog
+                    title="提示"
+                    :visible.sync="editDialogFlag"
+                    width="600px"
+                    top="10px"
+                    :before-close="handleClose">
+                    <!-- form detail -->
+                    <el-form ref="form" :model="detailData" label-width="100px">
+                        <el-form-item v-for="column in tableColumns" v-if="columnEditable(column)" :label="column.name">
+                            <el-select v-if="'select'==column.inputType" v-model="detailData[column.propertyName]">
+                                <el-option v-for="master in codeList" v-if="column.code==master.application + '_' +master.categoryId" :value="master.code">{{master.name}}</el-option>
+                            </el-select>
+                            <el-radio-group  v-else-if="'radio'==column.inputType" v-model="detailData[column.propertyName]">
+                                <el-radio-button v-for="master in codeList" v-if="column.code==master.application + '_' +master.categoryId" :label="master.code" >{{master.name}}</el-radio-button>
+                            </el-radio-group>
+                            <el-switch v-else-if="'flag'==column.inputType" v-model="detailData[column.propertyName]"
+                                active-value="1" inactive-value="0"></el-switch>
+                            <el-input v-else :style="`widht:800px!important`" v-model="detailData[column.propertyName]"></el-input>
+                        </el-form-item>
+                    </el-form>
+                    <el-button type="primary" @click="closeDialog()">更新</el-button>
+                </el-dialog>
+			</div>
+            
+            <div class="block">
+				<el-switch :value="studioLogFlag" v-model="studioLogFlag" active-text="更新DB" inactive-text="显示json"></el-switch>
+				<el-button type="primary" @click="showInfo()">Commit</el-button>
+				<el-switch :value="transType" v-model="transType" active-text="大写字段名" inactive-text="驼峰名"></el-switch>
+				<el-switch :value="wechatFlag" v-model="wechatFlag" active-text="微信JSON" style="margin-left:10px"></el-switch>
+				<el-button type="primary" @click="formatJson()" v-if="tableColumns.length>0">FormatJson</el-button>
+			</div>
+            
+            <div class="block">
+                <el-input type="textarea" class="texareaHeight" v-model="editJsonStr" id="editJsonStr" rows="12"></el-input>
+                <el-button type="primary" :disabled="''==editJsonStr" class="btn-copyJson texareaHeight" @click="copyJsonStr()">Copy</el-button>
+            </div>
+		</div>
+		
+		<script>
+        var indexDB = new indexDb()
+		new Vue({
+    	    el: '#app',
+    	    data: function() {
+    	        return { 
+					dbTables : getGroupKeys(tableData),
+                    tableName : "FIREEMBLEM_HERO",
+                    codeList : tableData["CODE_MASTER"],
+                    listProp : {},
+                    tableColumns : [],
+                    sortColumn : "",
+                    originList : {},
+					condition : {},
+                    detailData : {},
+                    faceColumnWidth : 75,
+                    studioLogFlag : false,
+                    transType : false,
+                    editDialogFlag : false,
+                    wechatFlag : false,
+                    editJsonStr : "",
+                    maxId : 0,
+                    idKey : "",
+                    localFlag : "0"
+				}
+    	    },
+			// 編集用データ
+			computed: {
+				dataList(){
+                    let cond = {}
+                    $.each(this.condition,(K,V)=>{
+                        if(isNotEmpty(V)) {
+                            cond[K] = V
+                        }
+                    })
+                    // if("1"== this.localFlag) {
+                    //     cond["pickFlag"] = true
+                    // } else if("0"== this.localFlag) {
+                    //     cond["pickFlag"] = false
+                    // }
+                    let result = filterAndCondtion(this.originList,cond,"and")
+					return result
+				},
+				tableList() {
+					let startPage = (this.listProp.pageNo - 1) * this.listProp.pageSize
+					let endPage = this.listProp.pageNo * this.listProp.pageSize
+					let result = []
+					for(let index = startPage ; index < endPage ; index++) {
+						// 防止最後一頁越界
+						if(!isNullObject(this.dataList[index])) {
+							// 添加修改flag
+							this.dataList[index].editFlag = false
+							result.push(this.dataList[index])
+						}
+					}
+					return result
+				},
+				tableWidth() {
+                    let width = 170 + this.faceColumnWidth
+                    $.each(this.tableColumns,(index,column)=>{
+                        if("●"==column.listVisable){
+                            width += parseInt(column.listLength)
+                        }
+                    })
+                    return {"width":width+"px"}
+                },
+			},
+			// 监听器
+			watch : {
+                tableName(newV,oldV) {
+                    this.getInfoFromDB(newV)
+                },
+                condition : {
+                    handler(new_value,old_value) {
+                        this.listProp = isInclude(this.tableName,["FIREEMBLEM_HERO","FGO_SERVANT","HONOR_KINGS"]) ? {"pageNo" : 1 , "pageSize" : 10} : {"pageNo" : 1 , "pageSize" : 15}
+                    },
+                    deep : true
+                },
+			},
+			// 初期化処理
+			mounted() {
+                let defaultTable = localStorage.getItem('defaultTable')
+                this.tableName = isEmpty(defaultTable) ? "FIREEMBLEM_HERO" : defaultTable
+                //
+                this.listProp = isInclude(this.tableName,["FIREEMBLEM_HERO","FGO_SERVANT","HONOR_KINGS"]) ? {"pageNo" : 1 , "pageSize" : 10} : {"pageNo" : 1 , "pageSize" : 15}
+                setTimeout(()=>{
+                    this.getInfoFromDB()
+                },500)
+                this.condition = cleanData(tableData[this.tableName][0])
+			},
+			//
+			methods: {
+                // 初始化处理,根据数据源取个相关数据和配置信息
+                getInfoFromDB() {
+                    this.condition = {}
+                    // 取得配置信息
+                    let request = indexDB.getData("tableInfo")
+                    request.onsuccess = (event) => {
+                        let data = event.target.result[this.tableName]
+                        this.tableColumns = data.columns
+                        this.sortColumn = isEmpty(data["orderby"]) ? "id" : data["orderby"]
+                    }
+                    
+                    // 取得数据
+                    let request2 = indexDB.getData(this.tableName)
+                    request2.onsuccess = (event) => {
+                        this.maxId = event.target.result.length
+                        this.idKey = isEmpty(idKeyMap[this.tableName]) ? "" : idKeyMap[this.tableName]
+                        this.originList = toEditableList(event.target.result,this.idKey)
+                        if(isNotEmpty(sortMap[this.tableName])) {
+                            this.originList = sortByCol(this.originList, sortMap[this.tableName], "desc")
+                        }
+                    }
+                },
+                setLocalStageProp(){
+                    localStorage.setItem('defaultTable',this.tableName)
+                },
+				handleSizeChange(val) {
+					this.listProp.pageSize = val
+					this.listProp.pageNo = 1
+				},
+				handleCurrentChange(val) {
+					this.listProp.pageNo = val
+				},
+                handleClose(){
+                    this.editDialogFlag = false
+                },
+                closeDialog(){
+                    console.debug(this.detailData)
+                    if("FIREEMBLEM_HERO" == this.tableName && "insert" == this.detailData.updateType) {
+                        let key = this.detailData["imgName"]
+                        if (isEmpty(key)) {
+                            alert("请输入IMG NAME")
+                            return this.detailData
+                        } else if (isNotEmpty(this.originList[key])) {
+                            alert("重复的IMG NAME,请重新输入或确认数据")
+                            return this.detailData
+                        }
+                        this.originList[key] = this.detailData
+                    }
+                    editRowData(this.detailData,this.tableName)
+                    this.editDialogFlag = false
+                    this.detailData.editFlag = false
+                },
+                // 清空检索条件
+                cleanCondition(){
+                    this.condition = cleanData(tableData[this.tableName][0])
+                    this.editJsonStr = ""
+                },
+                // 行编辑
+                editRow(row) {
+                    if(isEmpty(row.updateType)) {
+                        row.updateType = "update"
+                    }
+                    this.detailData = row
+                    this.editDialogFlag = true
+				},
+                // 复制行
+				copyRow(row) {
+                    let newRec = copyObject(row)
+                    // 只拷贝列表显示的内容
+                    newRec = editNewRow(newRec,row,this.tableName,this.tableColumns)
+                    this.maxId++
+					this.detailData = copyLine(this.tableList,newRec,this.maxId)
+				},
+                // 删除行
+                deleteRow(row,rowIndex) {
+                    // 删除显示列表中行
+                    this.tableList = this.tableList.splice(rowIndex,1)
+                    // 删除原始列表中行
+                    delete this.originList[this.idKey]
+                },
+                changeStatus(data) {
+                    if ("MENU" == this.tableName) {
+                        let temp = data["defaultLink"]
+                        $.each(this.originList,(index, menu) => {
+                            menu["defaultLink"] = "0"
+                        })
+                        data["defaultLink"] = temp
+                    }
+
+                },
+                getCodeName(row,columnInfo){
+                    return getCodeByColumnInfo(this.codeList, columnInfo["code"], row[columnInfo.propertyName])
+                },
+                // 列左边固定
+                colFirst(colAttr){
+                    let fixedStr = ('image'==colAttr || 'img'==colAttr) ? "left" : ""
+                    return fixedStr
+                },
+                // 格式化Json文件内容,字段大写和驼峰互换
+                formatJson(){
+                    let result = editJsonFile(this.originList,this.tableColumns,this.transType,this.tableName)
+                    this.editJsonStr = jsonPrint(this.tableName,result)
+                    if(this.studioLogFlag){
+                        indexDB.update(this.tableName,removeEditFlag(result))
+                    }
+                },
+                // 输出编辑后结果
+                showInfo() {
+                    // 更新IndexDB
+                    let updList = mergeEditDataToOriginList(this.tableList,this.originList,"id")
+                    this.editJsonStr = jsonPrint(this.tableName,removeEditFlag(updList))
+                    if(this.studioLogFlag) {
+                        indexDB.update(this.tableName,updList)
+                    }
+                },
+                columnEditable(column){
+                    if('●'==column.updateable) {
+                        return true
+                    } else {
+                        return false
+                    }
+                },
+                getHonorFace(rec) {
+                    let imgUrl = "https://game.gtimg.cn/images/yxzj/img201606/heroimg/#NO#/#NO#-smallskin-#SKININEDX#.jpg".replace(/#NO#/g,rec["no"])
+                    imgUrl = imgUrl.replace("#SKININEDX#",rec["defSkinIndex"])
+                    return imgUrl
+                },
+                copyJsonStr(){
+                    let result = doCopy('editJsonStr','')
+                    if(result) {
+                        this.showMsg("JSON文件内容已复制")
+                    }
+                },
+                showMsg(messageStr){
+                    this.$notify.info({
+                        title: '消息',
+                        message: JSON.stringify(messageStr)
+                    })
+                },
+			},
+    	})
+		</script>
+	</body>
+</html>

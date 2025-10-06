@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>导入数据</title>
+		<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css" />
+		<link rel="stylesheet" href="../resources/common/vue_common.css" />
+		<style>
+            .tableNamePulldown {width:200px}
+		</style>
+		<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+		<script src="../resources/common/import/cryptico.js"></script>
+		<script src="../resources/common/vue_common.js"></script>
+		<script src="../resources/common/indexDB.js"></script>
+		<script src="../resources/data/tableDDL.json"></script>
+		<script src="../resources/data/tableData.json"></script>
+		<script src="https://unpkg.com/vue@2/dist/vue.js"></script>
+		<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+	</head>
+
+	<body>
+		<div id="app">
+			<div class="block">
+				<el-select class="tableNamePulldown" v-model="tableName">
+					<el-option v-for="tblNm in tableList" :value="tblNm" :label="tableInfoList[tblNm].name"></el-option>
+				</el-select>
+                <el-button type="primary" @click="setLocalStageProp()">设置初始表</el-button>
+			</div>
+            
+			<el-table :data="originList" border height="650" :style="'width:' + tableWidth +'px'" class="block">
+				<template v-for="(column,index) in columnAttrs">
+					<el-table-column :prop="column.attr" :label="column.name" :width="column.width">
+						<template slot-scope="scope">
+							<template v-if="scope.row.editFlag">
+								<!-- 文字输入 -->
+								<el-input v-if="`input-text`==column.htmlTag" v-model="scope.row[column.attr]" size="small"></el-input>
+								<!-- 下拉选单 -->
+								<el-select v-else-if="`select`==column.htmlTag" v-model="scope.row[column.attr]" clearable size="small">
+									<el-option v-for="opt in options[column.attr]" :value="opt.value" :label="opt.label"></el-option>
+								</el-select>
+								<!-- 数字 -->
+								<el-input-number v-else-if="`number`==column.htmlTag" 
+									v-model="scope.row[column.attr]" 
+									style="width:100px"
+									controls-position="right" 
+									size="small">
+								</el-input-number>
+								<!-- 滑块 -->
+								<el-switch v-else-if="`flag`==column.htmlTag" 
+									:value="'●'==scope.row[column.attr]" 
+									v-model="scope.row[column.attr]" 
+									active-value="●"
+									inactive-value="×"
+									active-color="red" 
+									inactive-color="gray">
+								</el-switch>
+								<!-- 文字 -->
+								<span v-else>{{scope.row[column.attr]}}</span>
+							</template>
+							<template v-else>
+								<el-select v-if="`select`==column.htmlTag" v-model="scope.row[column.attr]" disabled size="small">
+									<el-option v-for="opt in options[column.attr]" :value="opt.value" :label="opt.label"></el-option>
+								</el-select>
+								<span v-else>{{scope.row[column.attr]}}</span>
+							</template>
+						</template>
+					</el-table-column>
+				</template>
+				<el-table-column fixed="right" label="操作" width="100">
+					<template #default="scope">
+						<el-button type="primary" icon="el-icon-edit" size="mini" circle @click="editRow(scope.row)"></el-button>
+						<el-button type="warning" icon="el-icon-document-copy" size="mini" circle @click="copyRow(scope.row)"></el-button>
+					</template>
+				</el-table-column>
+			</el-table>
+			
+			<div class="block">
+				<el-switch :value="studioLogFlag" v-model="studioLogFlag" active-text="显示json" inactive-text="更新DB"></el-switch>
+				<el-button type="primary" @click="showInfo()">更新JSON</el-button>
+                <el-switch :value="allTableFlag" v-model="allTableFlag" active-text="全表导入" inactive-text="单表导入" class="left_20"></el-switch>
+				<el-button type="primary" @click="importJson()">导入JSON数据</el-button>
+			</div>
+            
+            <div class="block" id="copyJsonDiv">
+                <el-input type="textarea" v-model="editJsonStr" id="editJsonStr" :rows="12"></el-input>
+                <el-button type="primary" :disabled="''==editJsonStr" class="btn-copyJson" @click="copyJsonStr()">Copy</el-button>
+            </div>
+		</div>
+		
+
+		<script>
+        var indexDB = new indexDb()
+		new Vue({
+    	    el: '#app',
+    	    data: function() {
+    	        return { 
+					msg : "hello vue!",
+					tableName : "FIREEMBLEM_HERO",
+					tableList : getGroupKeys(tableInfo),
+					tableInfoList : copyObject(tableInfo),
+					studioLogFlag : false,
+                    allTableFlag : false,
+                    editJsonStr : "",
+                    originList : [],
+                    tableWidth : 120,
+					columnAttrs : [
+						{"attr": "column", "name" : "伦理名", "htmlTag" : "input-text", "width":"200"},
+						{"attr": "name", "name" : "物理名", "htmlTag" : "input-text", "width":"200"},
+						{"attr": "type", "name" : "数据库属性", "htmlTag" : "select", "width":"120"},
+						{"attr": "length", "name" : "长度", "htmlTag" : "number", "width":"125"},
+						{"attr": "listLength", "name" : "列表显示长度", "htmlTag" : "number", "width":"125"},
+						{"attr": "inputType", "name" : "页面输入类型", "htmlTag" : "select", "width":"150"},
+						{"attr": "pk", "name" : "主键", "htmlTag" : "flag", "width":"70"},
+						{"attr": "unique", "name" : "唯一键", "htmlTag" : "flag", "width":"70"},
+						{"attr": "notnull", "name" : "非空", "htmlTag" : "flag", "width":"70"},
+						{"attr": "disabled", "name" : "编辑", "htmlTag" : "flag", "width":"70"},
+						{"attr": "fifterable", "name" : "检索条件", "htmlTag" : "flag", "width":"80"},
+						{"attr": "insertable", "name" : "初始编辑", "htmlTag" : "flag", "width":"80"},
+						{"attr": "updateable", "name" : "更新", "htmlTag" : "flag", "width":"70"},
+						{"attr": "listVisable", "name" : "列表可见", "htmlTag" : "flag", "width":"80"},
+						{"attr": "propertyName", "name" : "驼峰命名", "htmlTag" : "span", "width":"200"},
+						{"attr": "code", "name" : "CODE", "htmlTag" : "input-text", "width":"180"},
+						{"attr": "defaultVal", "name" : "默认值", "htmlTag" : "input-text", "width":"80"},
+					],
+					options : {
+						"type" : [
+							{"label":"数字","value":"INTEGER"},
+							{"label":"計算数字","value":"NUMBER"},
+							{"label":"文字列","value":"VARCHAR"},
+							{"label":"時間","value":"TIMESTAMP"},
+						],
+						"inputType" : [
+							{"label":"输入框","value":"text"},
+							{"label":"下拉菜单","value":"select"},
+							{"label":"日期","value":"date"},
+							{"label":"单选按钮","value":"radio"},
+							{"label":"状态","value":"flag"},
+							{"label":"密码","value":"password"},
+							{"label":"图片","value":"image"},
+							{"label":"数字","value":"number"},
+						],
+					}
+				}
+    	    },
+			// 編集用データ
+			computed: {
+			},
+			// 监听器
+			watch : {
+                tableName(newV,oldV){
+                    if(oldV!==newV) {
+                        this.editJsonStr = ""
+                        this.originList = this.editColumnList(tableInfo[this.tableName]["columns"])
+                    }
+                }
+			},
+			// 初期化処理
+			mounted() {
+                let encryptStr = getEncryptStr(cryptico,"Saber@74189632","19880816")
+                let decryptStr = getDecryptStr(cryptico, encryptStr, "19880816")
+                
+                // local stage使用
+                let defaultTable = localStorage.getItem('defaultTable')
+                this.tableName = isEmpty(defaultTable) ? "FIREEMBLEM_HERO" : defaultTable
+                setTimeout(()=>{
+                    this.getInfoFromDB()
+                },500)
+			},
+			//
+			methods: {
+                setLocalStageProp(){
+                    localStorage.setItem('defaultTable',this.tableName)
+                },
+				editRow(row) {
+					row.editFlag = !row.editFlag
+                    // 更新模式
+                    row["updateType"] = "update"
+				},
+				copyRow(row) {
+					copyLine(this.originList,row,"")
+				},
+                getInfoFromDB(){
+                    // 取得数据
+                    let request = indexDB.getData("tableInfo")
+                    request.onsuccess = (event) => {
+                        let resultList = event.target.result
+                        if(isEmpty(resultList)) {
+                            this.originList = this.editColumnList(tableInfo[this.tableName]["columns"])
+                        } else {                        
+                            this.originList = this.editColumnList(resultList[this.tableName]["columns"])
+                        }
+                    }
+                },
+                editColumnList(columnList){
+                    this.tableWidth = 120
+                    let onelineFlag = true
+                    $.each(columnList,(index,column)=>{
+						// Loop column attributes
+						$.each(this.columnAttrs,(index,attrs)=>{
+							// JSON没有定义属性时,追加属性
+							if(isNullObject(column[attrs.attr])) {
+								column[attrs.attr] = ""
+							}
+							// 驼峰命名
+							if(!isEmpty(column["column"])) {
+                                column["propertyName"] = tranColumnToProp(column["column"].toLowerCase(), false)
+							}
+                            // 行可编辑flag
+							column["editFlag"] = false
+                            // 
+                            if (onelineFlag) {
+                                this.tableWidth = parseInt(this.tableWidth) + parseInt(attrs["width"])
+                            }
+						})
+                        onelineFlag = false
+					})
+                    return columnList
+                },
+				showInfo(){
+                    removeEditFlag(this.originList)
+                    if(this.studioLogFlag) {
+                        this.editJsonStr = jsonPrint(this.tableName,this.originList)
+                    } else {
+                        tableInfo[this.tableName]["columns"] = this.originList
+                        indexDB.update("tableInfo",tableInfo)
+                        this.editJsonStr = jsonPrint(this.tableName,tableInfo[this.tableName]["columns"])
+                    }
+				},
+                copyJsonStr(){
+                    let result = doCopy('editJsonStr','')
+                    if(result) {
+                        this.showMsg("JSON文件内容已复制")
+                    }
+                },
+                importJson(){
+                    $.each(tableData,(tableName,dataList)=>{
+                        let records = []
+                        // json中添加列对应到数据中
+                        if(tableName == this.tableName) {
+                            let columns = tableInfo[tableName]["columns"]
+                            $.each(dataList,(index,data)=>{
+                                $.each(columns,(jndex,col)=>{
+                                    // 设置默认值
+                                        console.debug(col)
+                                    if(isEmpty(data[col.propertyName])) {
+                                        data[col.propertyName] = col.defaultVal
+                                    }
+                                })
+                            })
+                        }
+                        // 对每一行数据统一处理
+                        $.each(dataList,(index,row)=>{
+                            delete row["id"] // 删除json数据中ID属性
+                            records.push(row)
+                        })
+                        if (this.allTableFlag || (!this.allTableFlag && tableName == this.tableName)) {
+                            console.log(records)
+                            indexDB.update(tableName,records)
+                            setTimeout(()=>{
+                                this.$message({message: "IndexDB更新成功,Key:" + tableName + ";名称：" + tableInfo[tableName]["name"] + ",共" + records.length + "条数据！",type: 'success'})
+                            },500)
+                        }
+                        // 全表导入是导入配置数据
+                        if (this.allTableFlag) {
+                            indexDB.update("tableInfo",tableInfo)
+                            this.$message("导入配置信息成功!")
+                        }
+                    })
+                },
+                showMsg(messageStr){
+                    this.$notify.info({
+                        title: '消息',
+                        message: JSON.stringify(messageStr)
+                    })
+                },
+			},
+    	})
+		</script>
+	</body>
+</html>

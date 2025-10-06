@@ -1,0 +1,81 @@
+.cardList {
+  padding-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  overflow-x: scroll;
+  height: 1050px;
+}
+
+.card {
+  display: inline-block;
+  margin: 10px 5px 0px 0px;
+  width: 200px;
+  height: 500px;
+  box-shadow: 8px 8px 13px 0px rgb(108 87 87 / 44%), 0 0 15px rgb(96 129 151 / 86%);
+  border: solid 1px darkslateblue;
+  overflow: hidden;
+  position: relative;
+}
+
+.card:hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 10px 40px rgba(0, 255, 255, 0.8);
+}
+
+.card>table {
+  padding: 10px;
+  width: 100%;
+}
+
+.bgImg {
+  width: auto;
+  height: 150%;
+  position: absolute;
+  left: -150%;
+  top: -30%;
+  z-index: -1;
+  background-color: #0000004f;
+}
+
+.rarityStar {
+  width: 20px;
+  height: 20px;
+  z-index: 1;
+}
+
+.rarity {
+  display: grid;
+  grid-template-columns: repeat(6, 12px);
+}
+
+td>.level {
+  height: 50px;
+  width: 50px;
+  border: solid black 2px;
+  border-radius: 50%;
+  position: relative
+}
+
+td>.level>.inner {
+  position: absolute;
+  height: 45px;
+  width: 45px;
+  border: solid white 1px;
+  outline: solid #ffffff85 2px;
+  border-radius: 50%;
+  background: #353434ed;
+  ;
+  font-size: 25px;
+  left: 1px;
+  top: 1px;
+  font-family: system-ui;
+}
+
+div.text {
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
+}

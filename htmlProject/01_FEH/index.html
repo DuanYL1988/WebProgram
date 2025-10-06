@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+		<link rel="stylesheet" href="../resources/common/vue_common.css" />
+		<link rel="stylesheet" href="../resources/common/common.css" />
+		<style>
+		</style>
+		<script src="../resources/lib/jquery-3.4.1.min.js"></script>
+		<script src="../resources/common/vue_common.js"></script>
+		<script src="../resources/common/indexDB.js"></script>
+		<script src="https://unpkg.com/vue@2/dist/vue.js"></script>
+		<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+	</head>
+
+	<body>
+		<div id="app">
+			<!-- {{groupList}} -->
+            <template v-for="(list,key) in groupList">
+                <h2>{{key}}</h2>
+                <div class="box">
+                    <div class="cell" v-for="record in list" @click="showDetail(record)" v-if="record.pickFlag ==`1`">
+                        <el-avatar :size="80" :src="imgHost + record.faceImgUrl.replace(`{key}`,record.imgName + `_Face_FC.webp`)" decoding="async" loading="lazy"></el-avatar>
+                    </div>
+                </div>
+            </template>
+            
+            <el-dialog
+                title="立绘1"
+                :visible.sync="detailDialogFlag"
+                :width="(clientInfo.clientWidth/3) + `px`"
+                height = "90%"
+                top="20px"
+                :before-close="handleClose">
+                <div style="background-color:#d6cfff">
+                    <el-carousel trigger="click" :height="(clientInfo.clientHeight-130) + `px`" :autoplay="false">
+                        <el-carousel-item v-for="imgUrl in imageBox" >
+                            <img :src="imgUrl" :style="`height:`+ (clientInfo.clientHeight-150) + `px`" />
+                        </el-carousel-item>
+                    </el-carousel>
+                </div>
+            </el-dialog>
+		</div>
+		
+		<script>
+        var indexDbObj = new indexDb()
+        Vue.config.productionTip = false;
+		new Vue({
+    	    el: '#app',
+    	    data: function() {
+    	        return { 
+                    clientInfo: getBrowerSize(),
+					imgHost : "https://static.wikia.nocookie.net/feheroes_gamepedia_en/images/",
+                    dataList : [],
+                    groupKey : "color",
+                    detailDialogFlag : false,
+                    detailData : {},
+                    detailHeight : 20,
+                    imageBox : [],
+				}
+    	    },
+			// 編集用データ
+			computed: {
+                groupList(){
+                    return groupListByCol(this.dataList,this.groupKey)
+                },
+			},
+			// 初期化処理
+			mounted() {
+                setTimeout(()=>{
+                    let request = indexDbObj.getData("FIREEMBLEM_HERO")
+                    request.onsuccess = (event) => {
+                        this.dataList = event.target.result
+                    }
+                },500)
+			},
+			//
+			methods: {
+                showDetail(data){
+                    this.detailData = data
+                    this.detailHeight = isEmpty(data.normalImgUrl) ? 15 : 20
+                    //
+                    let repStr = data.imgName
+                    this.imageBox.push(this.imgHost + data.stageImg[0].replace('{key}', repStr + "_Face.webp"))
+                    this.imageBox.push(this.imgHost + data.stageImg[1].replace('{key}', repStr + "_BtlFace.webp"))
+                    this.imageBox.push(this.imgHost + data.stageImg[2].replace('{key}', repStr + "_BtlFace_C.webp"))
+                    this.imageBox.push(this.imgHost + data.stageImg[3].replace('{key}', repStr + "_BtlFace_D.webp"))
+                    this.detailDialogFlag = true
+                },
+                handleClose(){
+                    this.imageBox = []
+                    this.detailDialogFlag = false
+                },
+                showMsg(messageStr){
+                    this.$notify.info({
+                        title: '消息',
+                        message: JSON.stringify(messageStr)
+                    })
+                },
+			}
+    	})
+		</script>
+	</body>
+</html>

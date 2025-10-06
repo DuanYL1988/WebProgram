@@ -1,0 +1,12 @@
+.code_sample {
+  font-size: 1px;
+  width: 1000px;
+}
+
+td[class='rowNo'] {
+  width: 20px;
+}
+
+code {
+  font-family: Consolas;
+}

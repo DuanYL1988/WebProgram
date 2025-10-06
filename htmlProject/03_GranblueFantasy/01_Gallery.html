@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>碧蓝幻想角色一览</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css" />
+    <link rel="stylesheet" href="../resources/common/common.css" />
+    <link rel="stylesheet" href="../resources/css/ihover.css" />
+    <style>
+        html,
+        main {
+            font-size: 100%;
+            background-color: #e5e5e5
+        }
+        
+        .webSiteLink {
+            width: 150px
+        }
+
+        .faceImg {
+            width: 200px !important;
+            height: 220px !important;
+        }
+        
+        .pickBox {
+            position: absolute;
+            z-index: 2;
+            width: 40px;
+            height: 40px;
+            right: 10px;
+        }
+        .pickBox:checked {
+            background-color:blue
+        }
+
+        button.like {
+            position: absolute;
+            top: 20px;
+            left: 50px;
+        }
+
+        .el-carousel__arrow{
+            /* top: 200%; */
+            background-color: rgb(0 0 0 / 59%);
+        }
+
+        .el-carousel__container {
+            height: 100%!important;
+        }
+    </style>
+    <script src="../resources/lib/jquery-3.4.1.min.js"></script>
+    <script src="https://unpkg.com/vue@2/dist/vue.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script src="../resources/common/vue_common.js"></script>
+    <script src="../resources/data/GranblueFantasy.json"></script>
+    <script>
+        const BASE_IMG_DIR = "../resources/00_illustration/04_GranblueFantasy/"
+        const IMG_HOST = "https://huiji-public.huijistatic.com/gbf/uploads/"
+        const WEB_HOST = "https://gbf.huijiwiki.com/wiki/"
+    </script>
+</head>
+
+<body style="padding-top: 0px!important;">
+    <main id="app" >
+        <div class="controllerArea">
+            原始数据件数:{{originList.length}} , 表示件数: {{showList.length}}
+        </div>
+        
+        <div class="mainArea">
+            <div class="cell" style="width:620px;height: 1200px; overflow-y: scroll;">
+                <table cellspacing="0" border="1" style="display: none;">
+                    <thead>
+                        <tr>
+                            <td>name</td>
+                            <td class="webSiteLink">link</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(item,index) in showList" :class="(index+2)%2 == 0 ? 'alt1' : 'alt2'">
+                            <td>{{item.name}}</td>
+                            <td>
+                                <button type="button" style="width: 60px;" @click="openChildWindow(item)">openPage</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="ih-item square effect6 bottom_to_top cell faceImg" v-for="data in showList" @click="openChildWindow(data)">
+                    <input type="checkbox" class="pickBox" v-model="data.pickFlag"></input>
+                    <a href="#">
+                        <div class="img">
+                            <img :src="data.localSrc" :alt="data.name" style="width:100%;height: 100%;">
+                        </div>
+                        <div class="info">
+                            <h3 style="font-size: 14px;"> {{data.name}}</h3>
+                        </div>
+                    </a>
+                </div>
+
+            </div>
+
+            <div class="cell" style="position: absolute;width: 70%;height:100%">
+                <div class="inputRow">
+                    <button type="button" @click="formatJson()">转换JSON</button>
+                </div>
+                
+                <div class="imgArea" style="height:100%" v-if="imageBox.length > 0">
+                    <el-carousel style="height: 100%" :autoplay=false arrow="always">
+                        <el-carousel-item v-for="imgUrl in imageBox" :key="imgUrl">
+                            <img :src="imgUrl" style="height: 100%" />
+                        </el-carousel-item>
+                    </el-carousel>
+                </div>
+                <div id="stageBox" style="margin-top:10px" v-else>
+                    <textarea style="width:70%;height:1000px;margin-left:20px;float:left"> {{jsonStr}}</textarea>
+                </div>
+                
+            </div>
+        </div>
+        </div>
+    </main>
+
+    <script>
+        new Vue({
+            el: '#app',
+            data: function () {
+                return {
+                    selectItem: null,
+                    showBG: true,
+                    webImgFlag: true,
+                    condition: {
+                    },
+                    imgHost: IMG_HOST,
+                    jsonStr : "",
+                    originList : dataList,
+                }
+            },
+            // 編集用データ
+            computed: {
+                imageBox: function () {
+                    let imgBox = []
+                    let data = this.selectItem
+                    if(null !== data) {
+                        $.each(this.selectItem.illImgs,(index, img)=>{
+                            imgBox.push(BASE_IMG_DIR + data.name + "_" + data.no + "/" + data.no + "_0" + (index+1) + ".png")
+                        })
+                    }
+                    return imgBox
+                },
+                showList: function () {
+                    let result = []
+                    $.each(dataList,(index,data) => {
+                        let addFlag = true
+                        // 单纯不想看
+                        if (data.category != "普通" && data.sex != "男") {
+                            addFlag = false
+                        }
+                        
+                        // 结果
+                        if(addFlag) {
+                            data["localSrc"] = BASE_IMG_DIR + data.name + "_" + data.no + "/faceIcon.jpg"
+                            data["pickFlag"] = true
+                            result.push(data)
+                        }
+                    })
+                    return result
+                }
+            },
+            watch: {
+                condition: {
+                    handler(new_value, old_value) {
+                    },
+                    deep: true
+                },
+            },
+            // 初期化処理
+            mounted() {
+            },
+            //
+            methods: {
+                lookSkin(item) {
+                    this.selectItem = item
+                },
+                openChildWindow(item) {
+                    this.selectItem = item
+                },
+                getShowImgSrc() {
+
+                },
+                formatJson(){
+                    this.jsonStr = ""
+                    $.each(dataList,(i,data)=>{
+                        if (data.pickFlag) {                        
+                            let editData = copyObject(data)
+                            delete editData.nameAttr
+                            delete editData.sex
+                            delete editData.faceImg2
+                            delete editData.pickFlag
+                            delete editData.localSrc
+                            editData["no"] = ("4" == data.no.substring(2,3) ? "1" : "2") + data.no.substring(3,7)
+                            editData["name"] = data.nameAttr
+                            this.jsonStr += "    " + JSON.stringify(editData) + (i < dataList.length -1 ? ",\n" : "\n")
+                        }
+                    })
+                    this.selectItem = {}
+                    //console.debug(jsonStr)
+                },
+                showMsg(messageStr) {
+                    this.$notify.info({
+                        title: '消息',
+                        message: JSON.stringify(messageStr)
+                    })
+                },
+            }
+        })
+    </script>
+</body>
+
+</html>

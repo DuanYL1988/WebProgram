@@ -1,0 +1,12 @@
+const bankCard = [
+    {"cardNo" : "6217906300011958074", "name":"DUAN　WENHAI", "password" : "324560", "cardType" : "debit", "limitDate" : "", "secutiyCd" : "", "bankCd" : "BOC", "bankNm" : "中国银行", "money": 0 , "memo" : "抚养人转账-段文海"},
+    {"cardNo" : "6217906300011958066", "name":"YANG LIAN", "password" : "456852", "cardType" : "debit", "limitDate" : "", "secutiyCd" : "", "bankCd" : "BOC", "bankNm" : "中国银行", "money": 0 , "memo" : "抚养人转账-杨莲"},
+    {"cardNo" : "6217751826000556525", "name":"DUAN　YANGLONG","password" : "456852", "cardType" : "debit", "limitDate" : "", "secutiyCd" : "", "bankCd" : "HSB", "bankNm" : "徽商银行", "money": 0 , "memo" : "结创工资卡"},
+    {"cardNo" : "6222625720000400517", "name":"DUAN　YANGLONG","password" : "456852", "cardType" : "debit",  "limitDate" : "", "secutiyCd" : "","bankCd" : "BOCM", "bankNm" : "交通银行", "money": 0 , "memo" : "交通银行储蓄卡"},
+    {"cardNo" : "6217211317003709208", "password" : "??????", "cardType" : "社保卡",  "limitDate" : "", "secutiyCd" : "","bankCd" : "ICBC", "bankNm" : "工商银行", "money": 0 , "memo" : "社保卡"},
+    {"cardNo" : "5528535729481181", "name":"DUAN　YANGLONG", "password" : "", "cardType" : "master credit", "limitDate" : "", "secutiyCd" : "","bankCd" : "BOCM", "bankNm" : "交通银行", "money": 0 , "memo" : "万事达信用卡"},
+    {"cardNo" : "6226565723587488", "name":"DUAN　YANGLONG", "password" : "", "cardType" : "UnionPay", "limitDate" : "04/27", "secutiyCd" : "466", "bankCd" : "BOCM", "bankNm" : "交通银行", "money": 0 , "memo" : "万事达信用卡"},
+    {"cardNo" : "4708812704136857", "name":"YANGLONG DUAN","password" : "6412", "cardType" : "VISA credit",  "limitDate" : "08/30", "secutiyCd" : "830","bankCd" : "SMBC", "bankNm" : "三井住友", "money": 0 , "memo" : ""},
+    {"cardNo" : "4624370230632627", "name":"ダンヨウリヨウ","password" : "8808", "cardType" : "VISA credit", "limitDate" : "05/26", "secutiyCd" : "455", "bankCd" : "MUFG", "bankNm" : "三菱东京UFJ", "money": 0 , "memo" : ""},
+    {"cardNo" : "", "password" : "", "limitDate" : "", "secutiyCd" : "", "cardType" : "", "bankCd" : "", "bankNm" : "", "money": 0 , "memo" : ""}
+]

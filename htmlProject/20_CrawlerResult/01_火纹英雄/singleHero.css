@@ -1,0 +1,72 @@
+/* 上方按钮区域 */
+#topBtnArea {
+  position: fixed;
+  margin: 2rem 0 0 2rem;
+  display: grid;
+  z-index: 9;
+}
+
+/* 立绘区域 */
+#heroIllustration {
+  position: absolute;
+}
+
+#imgName {
+  height: 70rem;
+}
+
+/* 具体信息区域 */
+#heroStatusArea {
+  background: url(../../resources/images/bk_fe_board.png) no-repeat;
+    background-size: 40rem 36rem;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    margin-top: 33rem;
+    margin-left: 8rem;
+}
+
+/* 称号和名称区域 */
+#titleArea {
+  height: 13rem;
+  margin-top: 1.4rem;
+}
+
+/* 称号和名称区域-文字 */
+#titleArea label {
+  display: grid;
+  padding-left: 7rem;
+  padding-top: 2rem;
+  text-shadow: #003 5px 5px 8px;
+  font-size: 1.4rem;
+  font-weight: bolder;
+  color: white;
+}
+
+/* 行 */
+.statusAndSkillRow {
+  padding-top: 1.1rem;
+  font-size: 1rem;
+}
+
+/* 值 */
+.statusAndSkillRow .value {
+  padding-left: 4rem;
+  color: yellow;
+}
+
+.statusAndSkillRow .title {
+  padding-left: 14rem;
+  color: white;
+}
+
+/* 下方区域 */
+#bottomBtnArea {
+  position: fixed;
+  top: 88rem;
+  left: 30rem;
+}
+
+#heroIllustration>img{
+  width: 100%;
+}

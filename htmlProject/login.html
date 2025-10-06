@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html style="height: 100%">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <!-- 外部样式 -->
+        <link href="./resources/common/common.css" rel="stylesheet" type="text/css" />
+        <!-- 内部式样 -->
+        <style type="text/css">
+            label{font-family: HG教科書体}
+        </style>
+        <!-- 页面图标 -->
+        <link rel="shortcut icon" href="https://external-preview.redd.it/zSlcEr2VE8OfDta-3phUF7RJ0Dje0zZAUGIUP6rQB3Q.jpg?auto=webp&s=2047df0c192cbbcfe60f23db2796dc8472609fc2" type="image/x-icon" />
+        <script src="./resources/lib/jquery-3.4.1.min.js"></script>
+        <script src="./resources/common/commonService.js"></script>
+        <script src="./resources/common/indexDB.js"></script>
+        <script src="./resources/data/config.json"></script>
+		<script src="https://unpkg.com/vue@2/dist/vue.js"></script>
+		<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+        </script>
+    </head>
+
+    <body style="position: relative;height: 100%;margin : 0;background-image: url('/00_illustration/03_碧蓝航线/Reno/Reno.png')">
+        <div id="app">
+        <header>
+            <span>{{message}}</span>
+        </header>
+
+        <el-collapse-transition v-show="false">
+        <div class="centerWindow" style="padding:20px;width:400px" >
+            <div class="block-title">
+                <div style="display:inline">
+                    <img style="width: 50px;height:50px" src="https://th.bing.com/th/id/OIP.XHWC9qnV_orUSUQ12eXV3AAAAA?rs=1&pid=ImgDetMain"></img>
+                    <label style="font-size:20px;position: relative; bottom: 15px;">{{title}}</label>
+                </div>
+            </div>
+            
+            <div class="editArea">
+                <div id="messageArea" style="color:red;display: none;">
+                    <span id="errorMsg"></span>
+                </div>
+                <div class="inputRow">
+                    <div class="inputCell">
+                        <label>选择应用</label>
+                        <select v-model="user.application" >
+                            <option></option>
+                            <option v-for="(name,id) in appList" :value="id">{{name}}</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="inputRow regist">
+                    <div class="inputCell">
+                        <label class="nessary">用户</label>
+                        <input type="text" v-model="user.userName" placeholder="请输入用户名"></input>
+                    </div>
+                </div>
+
+                <div class="inputRow regist">
+                    <div class="inputCell">
+                        <label class="nessary">手机号</label>
+                        <input type="text" v-model="user.telPhone" placeholder="请输入手机号"></input>
+                    </div>
+                </div>
+
+                <div class="inputRow">
+                    <div class="inputCell">
+                        <label class="nessary">密码</label>
+                        <input type="password" v-model="user.password"></input>
+                    </div>
+                </div>
+
+                <div class="inputRow">
+                    <button type="button" class="centerContent" @click="login('1')">登录</button>
+                    <button type="button" class="centerContent" @click="login('0')">注册</button>
+                </div>
+            </div>
+        </div>
+        </el-collapse-transition>
+        
+        </div>
+        <script>
+            var indexDbObj = new indexDb()
+            new Vue({
+                el: '#app',
+                data: function() {
+                    return { 
+                        message : "Hello Vue!",
+                        title : "茶叶监测数据分析",
+                        appList : application.app,
+                        user : {
+                            userName : "administrator",
+                            telPhone : "133****4560",
+                            application : "",
+                            password : "1",
+                        }
+                    }
+                },
+                // 編集用データ
+                computed: {
+                },
+                // 初期化処理
+                mounted() {
+                    console.debug("localhost:5173/api/login".replace(/^api/,''))
+                },
+                //
+                methods: {
+                    login(){
+                        let request = indexDbObj.getData("MHXY_ACCOUNT")
+                        request.onsuccess = (event)=>{
+                            
+                        }
+                        window.location = "index.html?id=4"
+                    }
+                }
+            })
+        </script>
+    </body>
+    <footer>
+        <span>footer</span>
+    </footer>
+    
+</html>

@@ -1,0 +1,9 @@
+/10_template
+/picture
+/20_CrawlerResult/**/*.json
+/20_CrawlerResult/**/*.csv
+/zz_study
+/work
+/**/00_illustration
+/**/images/
+/**/slickGrid

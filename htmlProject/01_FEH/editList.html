@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+        <title>人物排序</title>
+		<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+		<!-- <link rel="stylesheet" href="lib/vue-index.css"> -->
+		<link rel="stylesheet" href="../resources/common/vue_common.css" />
+		<style>
+		</style>
+		<script src="../resources/lib/jquery-3.4.1.min.js"></script>
+		<script src="../resources/common/vue_common.js"></script>
+		<script src="../resources/common/indexDB.js"></script>
+		<script src="https://unpkg.com/vue@2/dist/vue.js"></script>
+		<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+		<script src="../resources/data/tableData.json"></script>
+		<script src="editList.js"></script>
+	</head>
+
+	<body>
+		<div id="app">
+            <div>
+                <span>条件編集区</span>
+                <el-input v-if="false" v-model="testStr" @change="testReg()"></el-input>
+                <div class="cell">
+                    <label>Face</label>
+                    <el-switch v-model="faceFlag"  active-color="red"  inactive-color="gray"></el-switch>
+                </div>
+                <div class="cell">
+                    <label>作品</label>
+                    <el-select v-model="condition.origin" style="width: 200px!important">
+                        <el-option label="please select.." value=""></el-option>
+                        <el-option v-for="code in compositionList" :value="code.name">{{code.name}}</el-option>
+                    </el-select>
+                </div>
+                <div class="cell">
+                    <label>Top Count</label>
+                    <el-input v-model="topCount" style="width: 80px"></el-input>
+                    <el-button type="primary" @click="resetTop()">重置先头固定</el-button>
+                </div>
+            </div>
+            <div class="block">
+                <div>
+                    <el-button type="primary" @click="sortList()">按同角色个数排序</el-button>
+                    <el-button type="primary" @click="processType='updIll'">更新立绘</el-button>
+                    <el-button type="primary" @click="processType='updFace'">更新头像</el-button>
+                    <el-button type="primary" @click="processType='reName'">更新称号</el-button>
+                    <el-button type="primary" @click="registList()">持久化</el-button>
+                    <el-button type="primary" @click="cleanCondition()">Clean</el-button>
+                </div>
+                <el-table height="790" style="width:1300px" :data="dataList" border class="block">
+                    <el-table-column width="80" label="头像">
+                        <template v-if="faceFlag" slot-scope="scope">
+                            <el-avatar :size="40" :src="imgHost + scope.row.faceImgUrl.replace(`{key}`,scope.row.imgName + `_Face_FC.webp`)"></el-avatar>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="id" label="ID" width="80"></el-table-column>
+                    <el-table-column label="タイトル" width="200">
+                        <template slot-scope="scope">
+                            <el-input v-if="editable(scope.row,'titleName')" v-model="scope.row.titleName"></el-input>
+                            <label v-else>{{scope.row.titleName}}</label>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="name" label="名前" width="120">
+                        <template slot-scope="scope">
+                            <el-input v-if="editable(scope.row,'name')" v-model="scope.row.name"></el-input>
+                            <label v-else @click="condition.name = scope.row.name">{{scope.row.name}}</label>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="masterId" label="人物ID" width="80"></el-table-column>
+                    <el-table-column label="移動方式" width="120">
+                        <template slot-scope="scope">
+                            <el-select v-if="false" v-model="scope.row.moveType" >
+                                <el-option label="please select.." value=""></el-option>
+                                <el-option v-for="code in moveTypeList" :value="code.code" :label="code.name"></el-option>
+                            </el-select>
+                            <label v-else>{{scope.row.moveType}}</label>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="origin" label="作品" width="180">
+                        <template slot-scope="scope">
+                            <el-select v-if="false" v-model="scope.row.origin" >
+                                <el-option label="please select.." value=""></el-option>
+                                <el-option v-for="code in compositionList" :value="code.code" :label="code.name"></el-option>
+                            </el-select>
+                            <label v-else>{{scope.row.origin}}</label>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="rank" label="評価" width="80"></el-table-column>
+                    <el-table-column label="ソート" width="80">
+                        <template slot-scope="scope">
+                            <label>{{scope.row.favorite}}</label>
+                            <i v-if="!scope.row.topFlag" style="margin-left:10px" class="el-icon-check" @click="scope.row.topFlag = !scope.row.topFlag"></i>
+                            <i v-else style="margin-left:10px" class="el-icon-upload2" @click="scope.row.topFlag = !scope.row.topFlag"></i>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="count" label="同じキャラ" width="100"></el-table-column>
+                    <el-table-column width="180" label="操作">
+                        <!-- -->
+                        <template #default="scope">
+                            <el-button type="primary" v-if="scope.$index > 0 && !scope.row.topFlag" icon="el-icon-upload2" size="mini" circle @click="reSortRow(scope.row,scope.$index)"></el-button>
+                            <el-button type="primary" icon="el-icon-edit" size="mini" circle @click="editRow(scope.row)"></el-button>
+                            <!-- <el-button type="primary" v-if="scope.$index > 0" icon="el-icon-top" class="row-btn" circle @click=""></el-button> -->
+                            <!-- <el-button type="primary" icon="el-icon-bottom" class="row-btn" circle @click="deleteRow(scope.$index)"></el-button> -->
+                        </template> 
+                    </el-table-column>
+                </el-table>
+            </div>
+            
+            <div>
+                <el-dialog
+                    title="提示"
+                    :visible.sync="editDialogFlag"
+                    width="80%"
+                    :before-close="handleClose">
+                    <!-- form detail -->
+                    <el-form ref="form" :model="detailData" label-width="100px">
+                        <el-form-item label="头像">
+                            <el-input v-model="detailData.faceImgUrl"></el-input>
+                        </el-form-item>
+                        <el-form-item label="文件夹名">
+                            <el-input v-model="detailData.imgName"></el-input>
+                        </el-form-item>
+                    </el-form>
+                    <el-button type="primary" @click="handleClose()">更新</el-button>
+                </el-dialog>
+            </div>
+		</div>
+		
+		<script>
+        var indexDB = new indexDb()
+		new Vue({
+    	    el: '#app',
+    	    data: function() {
+    	        return { 
+                    imgHost : "https://static.wikia.nocookie.net/feheroes_gamepedia_en/images/",
+                    originDataList : [],
+                    moveTypeList : getCategoryList(tableData["CODE_MASTER"],"fe_move"),
+                    processType : "",
+                    testStr : "",
+                    dataList : [],
+                    tableName : "FIREEMBLEM_HERO",
+                    faceFlag : true,
+                    condition : {
+                        origin : "",
+                        name : ""
+                    },
+                    topCount : 0,
+                    compositionList : getCategoryList(tableData["CODE_MASTER"],"fe_composition"),
+                    detailData : {},
+                    editDialogFlag : false
+				}
+    	    },
+			// 編集用データ
+			computed: {
+
+			},
+			// 初期化処理
+			mounted() {
+                setTimeout(()=>{
+                    let request = indexDB.getData(this.tableName)
+                    request.onsuccess = (event) => {
+                        this.originDataList = initializeList(event.target.result,{"favorite" : "99", "rank" : "A"})
+                        this.dataList = sortByCol(this.originDataList,"favorite","")
+                    }
+                },100)
+			},
+            watch: {
+                processType(newV, oldV) {
+                    if(newV !== oldV) {
+                        this.dataList = [].concat(filterData(this.originDataList, newV, this.condition))
+                    }
+                },
+                condition : {
+                    handler(newV, oldV) {
+                        if(isNotEmpty(newV.origin) || isNotEmpty(newV.name)) {
+                        }
+                        this.dataList = filterAndCondtion(this.originDataList, this.condition, "and")
+                    },
+                    deep : true
+                }
+            },
+			//
+			methods: {
+                editRow(row){
+                    this.detailData = row
+                    this.editDialogFlag = true
+                },
+                handleClose(){
+                    this.editDialogFlag = false
+                },
+                // 清空检索条件
+                cleanCondition(){
+                    this.condition = cleanData(this.condition)
+                },
+                sortList() {
+                    this.dataList = [].concat(groupSortList(this.originDataList, "name"))
+                },
+                reSortRow(row,index){
+                    this.dataList = reSortList(row, this.dataList, index)
+                    if(this.dataList.length < this.originDataList.length) {                    
+                        this.originDataList = margeOriginList(this.dataList, this.originDataList)
+                    }
+                },
+                editable(row,attrName) {
+                    return (row.editFlag)
+                },
+                deleteRow(index) {
+                    console.log(this.dataList.length)
+                    this.dataList.splice(index,1)
+                },
+                registList(){
+                    this.dataList = regist(this.dataList)
+                    if (this.dataList.length > 300) {
+                        indexDB.update(this.tableName,this.dataList)
+                        this.showMsg("UPDATE SUCCESS!")
+                    }
+                },
+                resetTop(){
+                    localStorage.setItem('topFixCount',this.topCount)
+                    this.showMsg("重置固定")
+                },
+                showMsg(messageStr){
+                    this.$notify.info({
+                        title: '消息',
+                        message: JSON.stringify(messageStr)
+                    })
+                },
+			}
+    	})
+		</script>
+	</body>
+</html>

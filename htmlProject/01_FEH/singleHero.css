@@ -1,0 +1,83 @@
+/* 上方按钮区域 */
+#topBtnArea{
+  position: fixed;
+  margin: 2rem 0 0 2rem;
+  display: grid;
+  z-index:9;
+}
+/* 立绘区域 */
+#heroIllustration {
+  position : absolute;
+}
+#imgName {
+ height: 92rem;
+}
+/* 具体信息区域 */
+#heroStatusArea {
+  background:url(../resources/images/bk_fe_board.png)no-repeat;
+    background-size: 60rem 56rem;
+    position: absolute;
+    width: 60rem;
+    height: 56rem;
+    margin-top: 33rem;
+    margin-left: 10rem;
+}
+/* 称号和名称区域 */
+#titleArea{
+    height: 15rem;
+    margin-top: 1.4rem;
+}
+/* 称号和名称区域-文字 */
+#titleArea label {
+display: grid;
+    padding-left: 9rem;
+    padding-top: 3.6rem;
+    text-shadow: #003 5px 5px 8px;
+    font-size: 2.1rem;
+    font-weight: bolder;
+    color: white;
+}
+/* 神裝圖標 */
+.newSkin {
+    width: 6rem;
+    position: absolute;
+    left: 23rem;
+    top: 0.5rem;
+}
+.blessType {
+  padding-left: 54rem;
+  margin-top: -2rem;
+  width : 6rem;
+}
+
+/* 行 */
+.statusAndSkillRow {
+    padding-top: 1.1rem;
+    font-size: 1.9rem;
+}
+/* 值 */
+.statusAndSkillRow .value{
+  padding-left: 4rem;
+  color : yellow;
+}
+.statusAndSkillRow .title{
+  padding-left: 14rem;
+  color : white;
+}
+/* 下方区域 */
+#bottomBtnArea {
+  position: fixed;
+  top: 88rem;
+  left: 30rem;
+}
+/* 图片导航 */
+ul li {
+  float: left;
+  margin-left: 2.5rem;
+  color: white;
+  list-style: circle;
+  transform: scale(2.5);
+}
+ul .li-active,ul li:hover {
+  list-style: disc;
+}

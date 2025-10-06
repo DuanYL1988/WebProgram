@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+	<link rel="stylesheet" href="../resources/common/vue_common.css" />
+	<link rel="stylesheet" href="../resources/common/common.css" />
+	<style>
+		.editTable {
+			height: 800px;
+			overflow-y: scroll;
+		}
+
+		input[type='text'] {
+			width: 300px;
+			height: 20px;
+		}
+
+		.faceIcon {
+			width: 60px;
+		}
+        
+        .actionBtn {
+            height : 40px;
+            min-width : 100px;
+        }
+	</style>
+	<script src="../resources/lib/jquery-3.4.1.min.js"></script>
+	<script src="../resources/common/vue_common.js"></script>
+	<script src="../resources/common/indexDB.js"></script>
+	<script src="localdata_feh.json"></script>
+	<script src="https://unpkg.com/vue@2/dist/vue.js"></script>
+	<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+	<script>
+		function editWeData(data) {
+			delete data.cutInImg
+			delete data.artImg
+			delete data.rank
+			delete data.pickFlag
+			delete data.no
+			delete data.nameJp
+			delete data.spriteImg
+			delete data.blessing
+			delete data.heroType
+			delete data.skillName
+			delete data.masterId
+			delete data.limitPlus
+			delete data.dragonFlower
+			delete data.dragonFlower
+			delete data.linkNm
+			return data
+		}
+	</script>
+</head>
+
+<body>
+	<div id="app">
+		<div class="editTable">
+			<table v-if="editListShowFlag" cellspacing="0" border="1">
+				<thead>
+					<tr>
+						<th rowspan="2">#</th>
+						<th rowspan="2">face</th>
+                        <th>称号</th>
+						<th>立绘1</th>
+						<th>立绘2</th>
+						<th rowspan="2">更新</th>
+					</tr>
+					<tr>
+                        <th>名</th>
+						<th>立绘3</th>
+						<th>立绘4</th>
+					</tr>
+				</thead>
+				<tbody>
+					<template v-for="(data,index) in editList">
+						<tr>
+							<td rowspan="2">{{index}}</td>
+							<td rowspan="2">
+                                <img :src="imgHost + data.faceImgUrl.replace(`{key}`,data.imgName + `_Face_FC.webp`)" class="faceIcon" />
+                            </td>
+                            <td>{{data.linkNm}}</td>
+							<td><el-input v-model="data.stageImg[0]" /></td>
+							<td><el-input v-model="data.stageImg[1]" /></td>
+							<td rowspan="2">
+								<el-button style="width:100px; height: 50px;" @click="updateData(data)" />更新</el-button>
+								<el-button style="width:100px; height: 50px;" @click="openImgUrl(data)" />链接</el-button>
+							</td>
+						</tr>
+						<tr>
+                            <td>{{data.nameCn + data.heroType}}</td>
+							<td><el-input v-model="data.stageImg[2]" /></td>
+							<td><el-input v-model="data.stageImg[3]" /></td>
+						</tr>
+					</template>
+				</tbody>
+			</table>
+            
+            <table v-else cellspacing="0" border="1">
+                <thead>
+					<tr>
+						<th>#</th>
+						<th>face</th>
+                        <th>称号</th>
+						<th>名称</th>
+						<th>立绘色气</th>
+						<th>突破</th>
+						<th>实装日期</th>
+						<th>Link</th>
+					</tr>
+				</thead>
+				<tbody>
+					<template v-for="(data,index) in dataList">
+						<tr>
+							<td>{{data.no}}</td>
+							<td>
+                                <!-- <img :src="imgHost + data.faceImgUrl.replace(`{key}`,data.imgName + `_Face_FC.webp`)" class="faceIcon" /> -->
+                            </td>
+                            <td>{{data.titleName}}</td>
+                            <td>{{data.name}}</td>
+                            <td>{{data.favorite}}</td>
+                            <td>{{data.limitPlus}}</td>
+                            <td>{{data.releaseDate}}</td>
+                            <td>
+								<el-button style="width:100px; height: 50px;" @click="openImgUrl(data)" />链接</el-button>
+							</td>
+					</template>
+				</tbody>
+            </table>
+		</div>
+		<div class="btnArea" style="margin-top : 10px">
+			<button type="button" class="actionBtn" @click="formatWechatData()">格式化</button>
+            <button type="button" class="actionBtn" @click="getEditedDataJson()">更新URL-Json</button>
+            <button type="button" class="actionBtn" @click="sortList('releaseDate')">排序</button>
+		</div>
+		<div id="copyJsonDiv" style="margin-top : 10px">
+			<el-input type="textarea" v-model="editJsonStr" :style="`width:`+clientInfo.clientWidth - 200+`px`"
+				id="editJsonStr" :rows="12"></el-input>
+			<el-button type="primary" :disabled="''==editJsonStr" class="btn-copyJson" @click="copyJsonStr()">Copy</el-button>
+		</div>
+	</div>
+
+	<script>
+		var indexDbObj = new indexDb()
+		var keyColumn = "imgName"
+		const keyWord = "http://photogz.photo.store.qq.com/psc?/V51v220v2C0E493HVi1R4bhVpB2uqOS1/bqQfVz5yrrGYSXMvKr"
+		const keyWord2 = "http://m.qpic.cn/psc?/V51v220v2C0E493HVi1R4bhVpB2uqOS1/bqQfVz5yrrGYSXMvKr"
+		const keyWord3 = "http://m.qpic.cn/psc?/V51v220v2C0E493HVi1R4bhVpB2uqOS1/"
+		Vue.config.productionTip = false;
+		console.debug(list)
+		new Vue({
+			el: '#app',
+			data: function () {
+				return {
+					clientInfo: getBrowerSize(),
+					imgHost: "https://static.wikia.nocookie.net/feheroes_gamepedia_en/images/",
+					dataList: [],
+					wechatDataList: transListToMap(list, keyColumn),
+					editJsonStr: "",
+                    editListShowFlag : true
+				}
+			},
+			// 編集用データ
+			computed: {
+				editList: function () {
+					let result = []
+					$.each(this.dataList, (index, data) => {
+						let key = data[keyColumn].replace(/_/g, '')
+						// 在微信小程序中表示的数据
+						// 未上传图片
+						if (data.pickFlag == "1") {
+							// 未编辑路径的数据
+							if (isEmpty(this.wechatDataList[key])) {
+                                // 立绘URL清空,准备输入QQ空间URL 
+                                data.stageImg = ["","","",""]
+								result.push(data)
+							} else {
+								const NEW_HERO = []
+								if(NEW_HERO.indexOf(data[keyColumn]) >= 0) {
+									// result.push(this.wechatDataList[key])
+								}
+							}
+						}
+					})
+					return result
+				}
+			},
+			// 初期化処理
+			mounted() {
+				setTimeout(() => {
+					let request = indexDbObj.getData("FIREEMBLEM_HERO")
+					request.onsuccess = (event) => {
+						this.dataList = event.target.result
+						this.dataList = sortByCol(this.dataList, "releaseDate", "desc")
+					}
+				}, 500)
+			},
+			//
+			methods: {
+				async getDbData() {
+					// let request = indexDbObj.getData("FIREEMBLEM_HERO")
+				},
+				formatWechatData() {
+					let result = []
+					$.each(this.dataList, (index, data) => {
+						let key = data[keyColumn].replace(/_/g, '')
+						// 本地编辑数据且未上传图片
+						let weDt = this.wechatDataList[key]
+						if (!isEmpty(weDt)) {
+							let newData = {}
+							if (!isEmpty(weDt.normalImgUrl)) {
+								let stageImg = [weDt.normalImgUrl.replace(keyWord, "{key2}")
+									, weDt.attactImgUrl.replace(keyWord, "{key2}")
+									, weDt.extraImgUrl.replace(keyWord, "{key2}")
+									, weDt.breakImgUrl.replace(keyWord, "{key2}")
+								]
+								newData["stageImg"] = stageImg
+							} else {
+								newData = editWeData(data)
+								newData["stageImg"] = weDt.stageImg
+							}
+							if (weDt["stageImg"][0].indexOf("{key2}") >= 0) {
+								result.push(newData)
+							}
+						}
+					})
+					this.editJsonStr = jsonPrint("list", result)
+				},
+                getEditedDataJson() {
+                    let result = ""
+                    $.each(this.editList, (index, data) => {
+                        if ("" !== data.stageImg[0]) {
+                            let wechatData = this.editUrl(data)
+                            result += JSON.stringify(wechatData) + ",\n"
+                        }
+                    })
+                    this.editJsonStr = result
+                },
+                editUrl(data) {
+					data.stageImg = [
+						data.stageImg[0].replace(keyWord, "{key2}").replace("mnull&bo", "b&bo").replace("photolist&t=5", "viewer_4")
+						, data.stageImg[1].replace(keyWord, "{key2}").replace("mnull&bo", "b&bo").replace("photolist&t=5", "viewer_4")
+						, data.stageImg[2].replace(keyWord, "{key2}").replace("mnull&bo", "b&bo").replace("photolist&t=5", "viewer_4")
+						, data.stageImg[3].replace(keyWord, "{key2}").replace("mnull&bo", "b&bo").replace("photolist&t=5", "viewer_4")
+					]
+					data.stageImg = [
+						data.stageImg[0].replace(keyWord2, "{key2}").replace("mnull&bo", "b&bo").replace("photolist&t=5", "viewer_4")
+						, data.stageImg[1].replace(keyWord2, "{key2}").replace("mnull&bo", "b&bo").replace("photolist&t=5", "viewer_4")
+						, data.stageImg[2].replace(keyWord2, "{key2}").replace("mnull&bo", "b&bo").replace("photolist&t=5", "viewer_4")
+						, data.stageImg[3].replace(keyWord2, "{key2}").replace("mnull&bo", "b&bo").replace("photolist&t=5", "viewer_4")
+					]
+					//
+					data.stageImg = [
+						data.stageImg[0].replace(keyWord3, "{key3}").replace("mnull&bo", "b&bo").replace("photolist&t=5", "viewer_4")
+						, data.stageImg[1].replace(keyWord3, "{key3}").replace("mnull&bo", "b&bo").replace("photolist&t=5", "viewer_4")
+						, data.stageImg[2].replace(keyWord3, "{key3}").replace("mnull&bo", "b&bo").replace("photolist&t=5", "viewer_4")
+						, data.stageImg[3].replace(keyWord3, "{key3}").replace("mnull&bo", "b&bo").replace("photolist&t=5", "viewer_4")
+					]
+					let weChatData = copyObject(data)
+					// 攻击力格式化
+					weChatData.atk = (parseInt(weChatData.atk) + parseInt(weChatData.weaponPower)) + "(" + weChatData.weaponPower + ")"
+					delete weChatData.masterId
+					delete weChatData.nameJp
+					delete weChatData.cutInImg
+					delete weChatData.spriteImg
+					delete weChatData.artImg
+					delete weChatData.blessing
+					delete weChatData.heroType
+					delete weChatData.weaponPower
+					delete weChatData.race
+					delete weChatData.skillCd
+					delete weChatData.skillName
+					delete weChatData.skillIcon
+					delete weChatData.limitPlus
+					delete weChatData.dragonFlower
+					delete weChatData.rank
+					delete weChatData.pickFlag
+					delete weChatData.linkNm
+					delete weChatData.no
+                    return weChatData
+                },
+				updateData(data) {
+                    let weChatData = this.editUrl(data)
+					doCopy('editJsonStr', JSON.stringify(weChatData) + ",")
+					this.showMsg("JSON文件内容已复制")
+				},
+				openImgUrl(data) {
+					let link = "https://feheroes.fandom.com/wiki/" + data.linkNm
+					window.open(link)
+				},
+				copyJsonStr() {
+					let result = doCopy('editJsonStr', '')
+					if (result) {
+						this.showMsg("JSON文件内容已复制")
+					}
+				},
+                sortList(prop) {
+                   this.editListShowFlag = false;
+                   //this.dataList = sortByCol(this.dataList, "releaseDate", "asc")
+                   this.editJsonStr = jsonPrint("list",  this.dataList)
+                },
+				showMsg(messageStr) {
+					this.$notify.info({
+						title: '消息',
+						message: JSON.stringify(messageStr)
+					})
+				},
+			}
+		})
+	</script>
+</body>
+
+</html>

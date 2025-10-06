@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>导入数据</title>
+        <link href="../resources/common/common.css" rel="stylesheet" type="text/css" />
+		<style>
+		</style>
+		<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+        <script src="../resources/common/commonService.js"></script>
+		<script src="../resources/data/tableDDL.json"></script>
+		<script src="../resources/data/tableData.json"></script>
+        <script>
+            const COL_MP = {
+                "COLUMN" : {"dbCol" : "COLUMN_NAME", "javaNm" : "columnName"},
+                "NAME" : {"dbCol" : "COMMENT", "javaNm" : "comment"},
+                "TYPE" : {"dbCol" : "COLUMN_TYPE", "javaNm" : "columnType"},
+                "LENGTH" : {"dbCol" : "COLUMN_LENGTH", "javaNm" : "columnLength"},
+                "PK" : {"dbCol" : "PK_FLAG", "javaNm" : "pkFlag"},
+                "UNIQUE" : {"dbCol" : "UNIQUE_FLAG", "javaNm" : "uniqueFlag"},
+                "NOTNULL" : {"dbCol" : "NOTNULL_FLAG", "javaNm" : "notnullFlag"},
+                "DISABLED" : {"dbCol" : "LIST_EDITABLE", "javaNm" : "listEditable"},
+            }
+            
+            // 业务主键
+            var unionKey = ""
+            var tableName = "FIREEMBLEM_HERO"
+            var table = {}
+            
+            $(()=>{
+                getTableList()
+                insertQuary()
+            })
+            
+            /** 取得表一览 */
+            function getTableList(){
+                let output = ""
+                let selectEle = document.getElementById('tableList')
+                $.each(tableInfo,(tblnm, tblInfo)=>{
+                    output += tblnm + ":" + tblInfo.name + "\n"
+                    let option = document.createElement("option")
+                    option.label = tblInfo.name
+                    option.value = tblnm
+                    // 默认选中
+                    if(tableName == tblnm) {
+                        option.selected = true
+                        table = tblInfo
+                        tableName = tblnm
+                    }
+                    selectEle.appendChild(option)
+                })
+                $(selectEle).on('change',function(){
+                    table = tableInfo[this.value]
+                    tableName = this.value
+                })
+                $("#console").val(output)
+            }
+            
+            /** 将json数据转为insert quary */
+            function insertQuary(){
+                let valuesQuary = ""
+                // 表名
+                let valQuary = "INSERT INTO " + tableName + " ("
+                // 字段
+                $.each(table.columns,(j,data)=>{
+                    valQuary += data.column + ","
+                })
+                valQuary = valQuary.substring(0, valQuary.length - 1) + ") VALUES \n"
+                /**/
+                // 数据
+                let dataList = tableData[tableName]
+                let columnList = table.columns
+                $.each(dataList, (index, record)=>{                
+                    let singleQuary = ""
+                    // 字段列表
+                    $.each(columnList,(j,column)=>{
+                        let insertVal = record[column.propertyName] + ""
+                        if (column.type=="NUMBER") {
+                            if (""==insertVal) {
+                                insertVal = null
+                            }
+                        } else {
+                            // DB插入单引号
+                            if(isNotEmpty(insertVal) && insertVal.indexOf("'") > 0)  {
+                                insertVal = insertVal.replace(/'/g,"''")
+                            }
+                            // 火纹表的ID使用NO
+                            if("FIREEMBLEM_HERO" == tableName && "id" == column.propertyName) {
+                                insertVal = (isEmpty(record["no"]) || "2" === record["no"]) ? "I" + insertVal : record["no"]
+                            }
+                            insertVal = "'" + insertVal + "'"
+                        }
+                        singleQuary += (j==0 ? "(" : ", ") + insertVal
+                    })
+                    singleQuary += index == dataList.length - 1 ? ")" : "),"
+                    valQuary += singleQuary + "\n"
+                })
+                $("#console").val(valQuary)
+            }
+        
+            function mybatisXml(category){
+                // 
+                let baseNm = tableName
+                // 建表文
+                let createQuery = "CREATE TABLE "+tableName+" (\n"
+                // Model
+                let modelClass = "/*\n";
+                modelClass += " * " + table.name + "\n";
+                modelClass += " */\n";
+                modelClass += "public class " +tableName+ " {\n";
+                let methodText = "";
+                // XML
+                let xml = '<?xml version="1.0" encoding="UTF-8" ?>\n'
+                xml += '<!DOCTYPE mapper PUBLIC "-//MYBATIS.org//DTD Mapper 3.0//EN" "http://MYBATIS.org/dtd/MYBATIS-3-mapper.dtd" >\n'
+                xml += '<mapper namespace="com.thymeleaf.repository.'+baseNm+'Repository" >\n'
+                
+                let resultMap = '  <resultMap id="'+baseNm+'ResultMap" type="com.thymeleaf.model.'+baseNm+'" >\n'
+                let sqlId = '  <sql id="select_column_list">\n'
+                
+                let selectDto = '  <select id="selectByDto" parameterType="com.thymeleaf.model.'+baseNm+'" resultMap="'+baseNm+'ResultMap">\n'
+                selectDto += '    SELECT <include refid="select_column_list"></include> FROM '+tableName+'\n'
+                selectDto += '    <where>\n'
+                
+                $.each(table.columns,(i,column)=>{
+                    let result = getColumnInfo(column,i)
+                    createQuery += result.createQuery + "\n"
+                    //
+                    modelClass += result.modelClass + "\n"
+                    methodText += result.methodText + "\n"
+                    //
+                    resultMap += result.resultMap + "\n"
+                    sqlId += result.sqlId + "\n"
+                    selectDto += result.selectDto + "\n"
+                })
+                // DDL
+                unionKey = unionKey.substring(0, unionKey.length-1)
+                createQuery += ", PRIMARY KEY(" +unionKey+ ")\n)"
+                // ModelClass
+                modelClass += methodText
+                modelClass += "}"
+                // XML
+                xml += resultMap + '  </resultMap>\n\n'
+                xml += sqlId + '  </sql>\n\n'
+                selectDto +='    </where>\n    <if test="orderBy!=null">\n      ORDER BY ${orderBy}\n    </if>\n    LIMIT ${startRow} , ${pageSize}\n'
+                xml += selectDto + '  </select>\n'
+                xml += '</mapper>'
+                
+                let output = ""
+                if ("createTable" == category) {
+                    output = createQuery
+                } else if ("modelClass" == category) {
+                    output = modelClass
+                } else if("xml" == category) {
+                    output = xml
+                }
+                $("#console").val(output)
+            }
+            
+            /** 根据字段信息生成各种代码 */
+            function getColumnInfo(columnInfo, index) {
+                // DB字段
+                let column = columnInfo.column
+                // JAVA变量
+                let javaNm = columnInfo.propertyName
+                // 信息转换
+                let transCol = COL_MP[column]
+                if ('undefined' !== typeof(transCol)) {   
+                    column = transCol.dbCol
+                    javaNm = transCol.javaNm
+                }
+                /* 业务主键 */
+                unionKey += "●" == columnInfo.unique ? column + "," : ""
+                let createQuery = index > 0 ? ", " + column  : column
+                createQuery += " " + columnInfo.type + "(" + columnInfo.length + ")"
+                createQuery += "●" == columnInfo.notnull ? " not null" : "" 
+                
+                /* Model类 */
+                let modelClass = "    /** " + columnInfo.name + " */\n "
+                modelClass += "    public String " + javaNm + ";\n";
+                let methodText = "    /** \n";
+                methodText += "    * 设置" + columnInfo.name + "\n";
+                methodText += "    * @param " + javaNm + " " + columnInfo.name + "\n";
+                methodText += "    */\n";
+                methodText += "    public void set" + firstCharUpper(javaNm) + "(String " + javaNm +"){\n";
+                methodText += "        this." + javaNm + " = " + javaNm + ";\n"
+                methodText += "    }\n\n"
+                methodText += "    /** \n";
+                methodText += "    * 取得" + columnInfo.name + "\n";
+                methodText += "    * @return " + javaNm + " " + columnInfo.name + "\n";
+                methodText += "    */\n";
+                methodText += "    public String get" + firstCharUpper(javaNm) + "(){\n"
+                methodText += "        return " + javaNm + ";\n"
+                methodText += "    }\n"
+                
+                /* XML */
+                let resultMap = '    <result column="'+column+'" property="'+javaNm+'" jdbcType="'+columnInfo.type+'" />'
+                let sqlId = index > 0 ? '    , `' + column + '`' : '     `' + column + '`'
+                let selectDto = '      <if test="'+javaNm+'!=null and '+javaNm+'!=\'\'">\n'
+                selectDto += '        AND '+column+' = #{' + javaNm + '}\n'
+                selectDto += '      </if>'
+                
+                return {
+                    "createQuery" : createQuery
+                    , "modelClass" : modelClass
+                    , "methodText" : methodText
+                    , "resultMap" : resultMap
+                    , "sqlId" : sqlId
+                    , "selectDto" : selectDto
+                }
+            }
+            
+            function createDDL(){
+                let tblNm = $("#tableList").val()
+                let table = tableInfo[tblNm]
+                let result = "DROP TABLE " + tblNm + ";\n"
+                result += "CREATE TABLE " + tblNm + "(\n"
+                if(isNotEmpty(table)) {
+                    $.each(table.columns,(index,data)=>{
+                        result += (index > 0 ? "  , ": "  ") + data.column + " " + data.type + "(" + data.length + ")" + ("●"==data.pk ? " PRIMARY KEY": "") + "\n"
+                    })
+                    result += ");"
+                }
+                $("#console").val(result)
+            }
+            
+            function updateExcel(){
+                let tblNm = $("#tableList").val()
+                let table = tableInfo[tblNm]
+                let result = ""
+                if(isNotEmpty(table)) {
+                    $.each(table.columns,(index,data)=>{
+                        result += editExcelRow(data)
+                    })
+                }
+                $("#console").val(result)
+            }
+            
+            function editExcelRow(cellsVal){
+                let line = ""
+                $.each(cellsVal,(K,V)=>{
+                    if("listLength" !== K) {
+                        line += V + "\t"
+                    }
+                })
+                return line + "\n"
+            }
+            
+            function firstCharUpper(str) {
+                return str.substring(0,1).toUpperCase() + str.substring(1)
+            }
+        </script>
+        
+	</head>
+
+	<body>
+		<div id="app">
+            <div class="inputArea">
+                <select id="tableList">
+                    <option></option>
+                </select>
+            </div>
+            
+            <div class="buttonArea">            
+                <button type="button" onclick="insertQuary()">Insert</button>
+                <button type="button" onclick="createDDL()">DDL</button>
+                <button type="button" onclick="updateExcel()">excel</button>
+                <button type="button" onclick="mybatisXml('modelClass')">Model</button>
+                <button type="button" onclick="mybatisXml('xml')">XML</button>
+            </div>
+            
+            <div style="width:1000px;height:1200px">
+                <textarea id="console" style="width:100%;height:100%"></textarea>
+            </div>
+        
+		</div>
+	</body>
+</html>

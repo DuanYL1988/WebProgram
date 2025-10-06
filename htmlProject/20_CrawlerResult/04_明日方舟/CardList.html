@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="../../resources/images/feh/PageIcon.png">
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <link rel="stylesheet" href="../../resources/common/vue_common.css" />
+    <link rel="stylesheet" href="cardList.css" />
+    <style>
+       /* .detailBgImg{height:1200px; background-size: cover !important; background-position-y: center!important; background-repeat: no-repeat !important;background-color:#838383ed} */
+       .detailDialog{height:1200px;position: relative;background-color:#8a8d8fc2}
+       .detailBgImg {width: auto; height: 100%; object-fit: cover; position: absolute;}
+    </style>
+    <script src="../../resources/lib/jquery-3.4.1.min.js"></script>
+    <script src="../../resources/common/vue_common.js"></script>
+    <script src="https://unpkg.com/vue@2/dist/vue.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script src="./CrawlerResult.json"></script>
+    <script>
+        const IMG_HOST = "https://patchwiki.biligame.com/images/arknights/"
+        const BASE_IMG_DIR = "../../resources/00_illustration/04_Arknights/"
+        function getDetailInfo(data, netFlag) {
+            let bgSrc = IMG_HOST + data.stageOneImg;
+            let skinSize = data.skinImage.length
+            if (netFlag == "True") { // 网络图片地址
+                if (skinSize > 0) {
+                    bgSrc = IMG_HOST + data.skinImage[skinSize - 1];
+                } else if (data.rarity > 3) {
+                    bgSrc = IMG_HOST + data.stageTwoImg
+                }
+            } else { // 本地图片地址
+                if (skinSize > 0) {
+					// .replace(" ", "")
+                    bgSrc = BASE_IMG_DIR + data.nameCn + "/" + "20_skin_" + data.skinName[skinSize - 1] + ".png";
+                } else if (data.rarity > 3) {
+                    bgSrc = BASE_IMG_DIR + data.nameCn + "/" + "10_stage2.png"
+                } else {
+                    bgSrc = BASE_IMG_DIR + data.nameCn + "/" + "10_stage1.png"
+                }
+            }
+            data["background"] = "url(" + bgSrc + ") cover cover/center"
+            data["bgImg"] = bgSrc
+            data["stage"] = (data.rarity > 3 ? "stage2.png" : "stage1.png")
+            data["maxLevel"] = data.rarity == 3 ? 55 : data.rarity == 4 ? 75 : data.rarity == 5 ? 80 : 90
+            return data
+        }
+    </script>
+</head>
+
+<body>
+    <div id="app">
+        <div class="searchArea" style="margin-left:20px">
+            <div class="cell">
+                <el-select size="small" v-model="condition.vocation">
+                    <el-option value=""></el-option>
+                    <el-option v-for="item in nameList" :value="item.code" :key="item.code">{{item.label}}</el-option>
+                </el-select>
+            </div>
+            <div class="cell">
+                <el-select size="small" v-model="condition.rarity">
+                    <el-option value=""></el-option>
+                    <el-option value="6" label="SSR-高级资深干员"></el-option>
+                    <el-option value="5" label="SR-资深干员"></el-option>
+                    <el-option value="4" label="R-普通干员"></el-option>
+                    <el-option value="3" label="R-预备干员"></el-option>
+                </el-select>
+                <el-switch v-model="localNetFlag" active-text="网络图片" inactive-text="本地图片" active-value="True"
+                    inactive-value="False"></el-switch>
+            </div>
+        </div>
+        <!-- 头像Card -->
+        <div class="cardList" :style="{width: divWidth}">
+            <div v-for="data in dataList" class="card" @click="getDetail(data)">
+                <img class="bgImg" :src="data.bgImg" />
+                <table>
+                    <tr>
+                        <td class="classIcon">{{data.subVocation}}</td>
+                        <td colspan="2">
+                            <div class="rarity">
+                                <img class="rarityStar" v-for="n in parseInt(data.rarity)"
+                                    :src="`../../resources/images/feh/Icon_Rarity_5.png`">
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" style="height: 300px;"></td>
+                    </tr>
+                    <tr>
+                        <td><img :src="`../../resources/images/arknights/`+data.stage"></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="level">
+                                <div class="inner text">
+                                    {{data.maxLevel}}
+                                </div>
+                            </div>
+                        </td>
+                        <td></td>
+                        <td style="position: relative;">
+                            <div class="text"
+                                style="width:100px;background-color: #8c8d8dc2;position: absolute; right:0px; bottom: -10px;">
+                                {{data.nameCn}}</div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        
+        <!-- 详细Dialog  :style="{backgroundImage: detailBkImg}" -->
+        <el-dialog :visible.sync="detailFlag" title="干员详细" alt="Click" top="10px" width="90%">
+            <div class="detailDialog">
+                <img class="detailBgImg" :src="detailBkImg" draggable="true"/>
+                <div class="skinArea" style="position: relative;">
+                    <button class="cell" type="button" @click="defaultBkIndex = 1">精英一</button>
+                    <button class="cell" type="button" @click="defaultBkIndex = 2">精英二</button>
+                    <button v-for="(skinObj,index) in selsectData.skinName" @click="defaultBkIndex = index+3" class="cell" type="button">{{skinObj}}</button>
+                </div>
+                {{defaultBkIndex}}
+            </div>
+        </el-dialog>
+    </div>
+
+    <!-- Vue Js -->
+    <script>
+        new Vue({
+            el: '#app',
+            data: function () {
+                return {
+                    BASE_HREF: "https://feheroes.fandom.com/wiki/"
+                    , localNetFlag: "False"
+                    , dataList: []
+                    , condition: {
+                        "vocation": "近卫"
+                        , "rarity": "4"
+                    }
+                    , nameList: {}
+                    , selsectData: DATA_LIST[44]
+                    , defaultBkIndex: 0
+                    , detailFlag: true
+                }
+            },
+            // 編集用データ
+            computed: {
+                divWidth: function () {
+                    maxWidth = this.dataList.length % 2 == 0 ? this.dataList.length / 2 : this.dataList.length / 2 + 1
+                    return maxWidth * 220 + "px"
+                },
+                detailBkImg: function() {
+                    let defaultBkIndex = this.defaultBkIndex
+                    let illBox = [this.selsectData["stageOneImg"], this.selsectData["stageTwoImg"]]
+                    illBox.push(...this.selsectData["skinImage"])
+                    let bgstyle = IMG_HOST // "url("+
+                    if ((defaultBkIndex == 0 && this.selsectData.defaltSkin == 0) || defaultBkIndex > illBox.length){
+                        bgstyle += illBox[illBox.length-1]
+                    } else {
+                        bgstyle += illBox[defaultBkIndex-1]
+                    }
+                    let result =  bgstyle
+                    console.debug(result)
+                    return result
+                },
+            },
+            // 初期化処理
+            mounted() {
+                this.dataList = this.getDataList()
+            },
+            // 监听
+            watch: {
+                condition: {
+                    handler(newVal, oldVal) {
+                        this.dataList = this.getDataList()
+                    },
+                    deep: true
+                },
+                localNetFlag: {
+                    handler(newVal, oldVal) {
+                        this.dataList = this.getDataList()
+                    }
+                }
+            },
+            //
+            methods: {
+                getDataList: function () {
+                    resultList = []
+                    $.each(DATA_LIST, (index, data) => {
+                        let filterFlag = true
+                        if (isNotEmpty(this.condition.vocation) && data.vocation !== this.condition.vocation) {
+                            filterFlag = false
+                        }
+                        if (isNotEmpty(this.condition.rarity) && data.rarity !== this.condition.rarity) {
+                            filterFlag = false
+                        }
+                        if (filterFlag) resultList.push(getDetailInfo(data, this.localNetFlag))
+                        this.nameList[data.vocation] = { "code": data.vocation, "label": data.vocation }
+                    })
+                    return resultList
+                },
+                getDetail: function(data){
+                    this.selsectData = data
+                    this.detailFlag = true
+                    this.defaultBkIndex= 0
+                },
+                showMsg(messageStr) {
+                    this.$notify.info({
+                        title: '消息',
+                        message: JSON.stringify(messageStr)
+                    })
+                },
+            }
+        })
+    </script>
+</body>
+
+</html>

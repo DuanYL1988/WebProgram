@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../resources/common/common.css" />
+    <link rel="stylesheet" href="../resources/css/ihover.css" />
+    <style>
+        .ih-item.square {
+            width: 200px;
+            height: 100px;
+            border: 2px solid black;
+            padding: 3px 0 3px 0
+        }
+    </style>
+    <script src="../resources/lib/jquery-3.4.1.min.js"></script>
+    <script src="../resources/common/vue_common.js"></script>
+    <script src="../resources/data/GranblueFantasy.json"></script>
+    <script>
+        const BASE_IMG_DIR = "../resources/00_illustration/04_GranblueFantasy/"
+        const IMG_HOST = "https://huiji-public.huijistatic.com/gbf/uploads/"
+        const BASE_HREF = "https://gbf.huijiwiki.com/wiki/"
+        const FACE_PROP = "faceImg2"
+        let wechatJson = []
+        $(() => {
+            // 从json文件读取数据
+            createGalleryDiv(dataList)
+        })
+        
+        /** 创建相册 */
+        function createGalleryDiv(acterList) {
+            let parentDiv = document.getElementById("gallery")
+            let galleryDiv = $("#gallery>div")[0]
+            $.each(acterList, (index, data) => {
+                // 单纯不想看
+                if (data.category == "普通" && data.sex == "男") {
+                    return
+                }
+                // 数据可能有符合标准
+                if (isNotEmpty(data[FACE_PROP])) {
+                    let newDiv = galleryDiv.cloneNode(true);
+                    setGalleryDiv(newDiv, data)
+                    parentDiv.appendChild(newDiv)
+                    // 添加到微信小程序数据
+                    editWechatJson(data)
+                }
+            })
+            $(galleryDiv).hide()
+        }
+        
+        /** 初始化单个图像元素 */
+        function setGalleryDiv(galleryDiv, data) {
+            $(galleryDiv).find("img").attr("src", BASE_IMG_DIR + "/" + data.name + "_" + data.no + "/faceIcon2.jpg")
+            $(galleryDiv).find("h3").html(data.title + " : " + data.nameAttr)
+        }
+
+        function editWechatJson(data) {
+            let editData = copyObject(data)
+            delete editData.nameAttr
+            delete editData.sex
+            delete editData.faceImg2
+            editData["no"] = ("4" == data.no.substring(2,3) ? "1" : "2") + data.no.substring(3,7)
+            editData["name"] = data.nameAttr
+            wechatJson.push(editData)
+        }
+
+        function outputJson() {
+            $("#jsonStrDiv").show()
+            $("#gallery").hide()
+            formatJson(wechatJson)
+        }
+
+        /** 格式化json */
+        function formatJson(acterList) {
+            let jsonStr = "const dataList = [\n"
+            acterList = sortListByColumns(acterList, "editId")
+            $.each(acterList, (index, data) => {
+                jsonStr += "  " + JSON.stringify(data) + ",\n"
+            })
+            $("#jsonStr").val(jsonStr + "]")
+        }
+        
+    </script>
+</head>
+
+<body>
+    <div id="app">
+        <div class="listArea">
+            <table>
+                <thead>
+                    <th id="theadColumn">
+                    </th>
+                </thead>
+                <tbody id="tbodyRows">
+
+                </tbody>
+            </table>
+        </div>
+        
+        <div>
+            <button type="button" onclick="outputJson()">Json</button>
+        </div>
+
+        <!-- 头像 -->
+        <div id="gallery">
+            <div class="ih-item square effect6 bottom_to_top cell faceImg">
+                <a href="#">
+                    <div class="img">
+                        <img src="" style="width:100%;height: 100%;">
+                    </div>
+                    <div class="info">
+                        <h3 style="font-size: 14px;"></h3>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <div id="jsonStrDiv" style="display:none">
+            <textarea rows="40" cols="250" id="jsonStr"></textarea>
+        </div>
+    </div>
+</body>
+
+</html>

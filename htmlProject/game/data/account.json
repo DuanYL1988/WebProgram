@@ -1,0 +1,42 @@
+const MHXY_ACCOUNT = {
+	"dyldck" : {
+		"password" : "P@ssw0rd",
+		"roles" : [
+			{"name":"SDの陣","level":"67","menpai":"大唐官府","FB":""},
+			{"name":"全敏NE不要命","level":"70","menpai":"女儿村","FB":""},
+			{"name":"SDの宝图","level":"90","menpai":"方寸山","FB":""},
+			{"name":"みらいへの燕","level":"70","menpai":"大唐官府","FB":""},
+		]
+	},
+	"dyldst" : {
+		"password" : "1qaz@WSX3edc$RFV",
+		"roles" : [
+			{"name":"SDの陣","level":"65","menpai":"天宫","FB":""},
+		]
+	},
+	"dyldst2" : {
+		"password" : "74189632",
+		"roles" : [
+			{"name":"SDの陣","level":"50-","menpai":"花果山","FB":""},
+			{"name":"SDの陣","level":"50-","menpai":"九黎城","FB":""},
+		]
+	},
+	"duanyanglong@126.com" : {
+		"password" : "S****@7******2",
+		"roles" : [
+			{"name":"RE:","level":"109","menpai":"神木林","FB":""},
+		]
+	},
+	"duanyanglong123@163.com" : {
+		"password" : "S****@7******2",
+		"roles" : [
+			{"name":"RE:","level":"109","menpai":"无底洞","FB":""},
+		]
+	},
+	"dylsweetdeath@163.com" : {
+		"password" : "S****@7******2",
+		"roles" : [
+			{"name":"RE:","level":"109","menpai":"五庄观","FB":""},
+		]
+	},
+}

@@ -1,0 +1,12 @@
+const application = {
+  "app" : {
+    "management" : "管理员",
+    "fireemblem" : "火纹",
+    "fgo" : "FGO",
+    "illustration" : "立绘",
+    "mhxy" : "梦幻西游",
+    "local" : "本地应用",
+    "tool" : "工具应用",
+    "algorithm" : "算法",
+  },
+};

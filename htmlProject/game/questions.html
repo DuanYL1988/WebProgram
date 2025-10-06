@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ja_jp" dir="ltr">
+	<head>
+		<title>科举答题</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width">
+		<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <link rel="stylesheet" href="../resources/common/vue_common.css">
+		<style>
+
+		</style>
+		<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+        <script src="data/mh_question.json"></script>
+		<script src="../resources/common/vue_common.js"></script>
+		<script type="text/javascript">
+            
+		</script>
+		<script src="https://unpkg.com/vue@2/dist/vue.js"></script>
+		<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+	</head>
+	
+	<body>
+		<div id="app">
+            <div class="searchArea">
+              <el-tag v-for="category in categoryList" v-model="defCate" @click="filterList(category)">{{category}}</el-tag><br>
+              <el-input v-model="keyword" style="width:300px;margin-top:10px"></el-input>
+              <el-switch :value="showFlag" v-model="showFlag" active-value="1" inactive-value="0" active-text="已掌握" inactive-text="未掌握"></el-switch>
+              <el-button @click="showJsonStr()" type="primary">UPD</el-button>
+              <el-button @click="keyword=``" type="primary">Clean</el-button>
+            </div>
+            
+            <div v-if="``==keyword" style="height:500px;overflow-y:scroll">
+                <div class="levelOne" v-for="(arr,lv1) in searchTag">
+                    {{lv1}}
+                    <el-radio-group v-model="keyword" size="small">
+                        <el-radio-button v-for="(info,keyWord) in arr" :label="keyWord" ></el-radio-button>
+                    </el-radio-group>
+                </div>
+            </div>
+            
+            <div class="listArea">
+              <el-table :data="showList"  border stripe highlight-current-row
+                   height="800" style="width:1180px">
+                    <el-table-column prop="category" label="分类" width="100"></el-table-column>
+                    <el-table-column prop="question" label="问题" width="350"></el-table-column>
+                    <el-table-column prop="answer" label="答案" width="400"></el-table-column>
+                    <el-table-column prop="tag" label="标签" width="150">
+                        <template slot-scope="scope">
+                            <el-input v-model="scope.row.tag"></el-input>
+                        </template>
+                    </el-table-column>
+                    <el-table-column :prop="showFlag" label="掌握" width="100">
+                        <template slot-scope="scope">
+                            <el-switch :value="scope.row.showFlag" v-model="scope.row.showFlag" active-value="1" inactive-value="0"></el-switch>
+                        </template>
+                    </el-table-column>
+                    <el-table-column width="50" fixed="right" label="操作">
+                        <template #default="scope">
+                            <el-button type="primary" icon="el-icon-edit" size="mini" circle @click="editRow(scope.row)"></el-button>
+                        </template>
+                    </el-table-column>
+               </el-table>
+            </div>
+		</div>
+		
+		<script>
+		new Vue({
+    	    el: '#app',
+    	    data: function() {
+    	        return { 
+                    defCate : "龙门石窟",
+                    keyword : "",
+                    showFlag : "1",
+                    categoryList : getCodesInColumns(QUESTIONS,"category"),
+                    orginData : groupListByCol(QUESTIONS,"id"),
+              }
+    	    },
+          // 編集用データ
+          computed: {
+              showList(){
+                let condition = {"category":this.defCate}//"tag":"null"
+                if (""!==this.keyword) {
+                    condition = {"question":this.keyword}
+                }
+                condition["showFlag"] = "0"
+                let result = filterAndCondtion(QUESTIONS,condition,"and")
+                return result
+              },
+              searchTag(){
+                let tags = {}
+                $.each(QUESTIONS,(index,record)=>{
+                    // 标签
+                    if(record.tag.indexOf("，")>0 && "0"==record.showFlag) {
+                        let key = record.tag.split("，")[0]
+                        let val = record.tag.split("，")[1]
+                        if(isNullObject(tags[key])) {
+                            tags[key] = {}
+                            tags[key][val] = ""
+                        } else {
+                            tags[key][val] = ""
+                        }
+                    }
+                })
+                return tags
+              }
+          },
+          // 初期化処理
+          mounted() {
+            
+          },
+          //
+          methods: {
+            filterList(category){
+                this.defCate = category
+                this.keyword = ""
+            },
+            editRow(row){
+                this.orginData[row.id] = row
+                console.log(JSON.stringify(this.orginData[row.id]))
+            },
+            showJsonStr(){
+                let str = "const QUESTIONS = [\r\n"
+                $.each(this.orginData,(index,record)=>{
+                    let recStr = JSON.stringify(record)
+                    if("["==recStr.substring(0,1) && "]"==recStr.substring(recStr.length-1))
+                    recStr = recStr.substring(1,recStr.length-1)
+                    str += "  " + recStr + ",\r\n"
+                })
+                str += "]"
+                console.log(str)
+            },
+          }
+    	})
+		</script>
+
+	</body>
+</html>

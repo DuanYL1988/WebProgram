@@ -1,0 +1,86 @@
+/** BASE様式 */
+.block {
+  margin-top: 10px
+}
+
+.cell {
+  display: inline-block
+}
+
+/** BASE様式-END */
+
+.row-btn {
+  width: 40px;
+  height: 40px;
+}
+
+/** ELEMENT-UI様式 */
+.el-tag {
+  margin-left: 3px
+}
+
+thead .el-table__cell {
+  background-color: #753a95 !important;
+  color: white
+}
+
+.el-table--striped .el-table__body tr.el-table__row--striped td.el-table__cell {
+  background: #f6fbe7;
+}
+
+.el-table--border,
+.el-table td.el-table__cell,
+.el-table th.el-table__cell.is-leaf {
+  border-color: #9f9797;
+}
+
+/* 对话框主体没有间隔 */
+.el-dialog__body {
+  padding: 0px 0px 0 0 !important
+}
+
+.el-table__body {
+  font-size: 14px
+}
+
+.el-form-item__label {
+  width: 150px;
+}
+
+.el-descriptions-item__label.is-bordered-label {
+  font-weight: 700;
+  color: #1f3f81;
+  background: #caffec;
+}
+
+.el-descriptions .is-bordered .el-descriptions-item__cell {
+  border: 1px solid #2e3952;
+}
+
+.el-descriptions__body .el-descriptions__table .el-descriptions-item__cell {
+  line-height: 1
+}
+
+/* 输入框 */
+#copyJsonDiv {
+  position: absolute;
+  width: 100%;
+}
+
+#editJsonStr {
+  font-family: auto
+}
+
+.el-textarea {
+  border: solid 1px;
+  border-radius: 5px;
+  width: 95%;
+}
+
+.btn-copyJson {
+  width: 80px;
+  margin-left: -81px;
+  border: 1px solid #0c0c0c !important;
+  position: absolute;
+  height: 100%;
+}

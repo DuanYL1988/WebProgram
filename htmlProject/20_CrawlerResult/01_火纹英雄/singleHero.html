@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>火纹英雄立绘</title>
+  <link href="../resources/common/common.css" rel="stylesheet" />
+  <link href="../resources/css/illustration.css" rel="stylesheet" />
+  <style>
+    button {border: 2px solid gold; background-color: burlywood; font-size: large; margin-left: 7.3rem;}
+  </style>
+  <link href="singleHero.css" rel="stylesheet" />
+  <script src="../resources/lib/jquery-3.4.1.min.js"></script>
+  <script src="../resources/common/commonService.js"></script>
+  <script src="../resources/data/tableDDL.json"></script>
+  <!-- <script src="../resources/common/webSql.js"></script> -->
+  <!-- <script src="singleHero.js"></script> -->
+</head>
+
+<body>
+  <main>
+    <!-- 检索区 -->
+    <div id="btnSearchItem" style="left: 15rem;">
+      <input id="searchTxt" type="text" oninput="fifterResult(this)" />
+      <div id="resultArea" style="display:null"> </div>
+    </div>
+    <!-- 主页面 -->
+    <div id='activity' style='background:url(../resources/images/backgound_v.jpg)no-repeat;width: 82rem;height: 95rem;'>
+      <div id='sameHero'>
+      </div>
+      <div id='topBtnArea'>
+        <input type="image" class="animate" src="../resources/images/btn-back.png" onclick="goBack()" width="80px" />
+        <input type="image" class="animate" src="../resources/images/btn-show.png" onclick="hideInfoArea(this)" width="80px" id="btn-show" />
+        <input type="image" src="../resources/images/setup.png" onclick="resetSize()" width="50px" style="margin-left:15px" />
+      </div>
+      <div id='heroIllustration'>
+        <img id="imgName" src='' onclick="window.open(this.src)"/>
+      </div>
+      <!-- 面板 -->
+      <div id='heroStatusArea' style='display:null'>
+        <!-- 称号 名称 -->
+        <div id='titleArea'>
+          <label id="titleName">明日之光</label>
+          <label id="name">米卡亚</label>
+          <img class="blessType" src="../resources/images/bless_fire.png">
+          <img class="newSkin" src="../resources/images/new_skin.png">
+        </div>
+        
+        <!-- 各种状态icon -->
+        <!-- <div id="codeImageArea"/> -->
+      
+        
+        <!-- 属性 -->
+        <div class="textArea" style="margin-left: 12rem;padding-top: 6.6rem;">
+            <div class="leftText" style="width:200px;display:inline-block">
+                <div class="statusAndSkillRow">
+                  <label class="value" id="hp">29</label>
+                </div>
+                <div class="statusAndSkillRow">
+                  <label class="value" id="attact">29</label>
+                </div>
+                <div class="statusAndSkillRow">
+                  <label class="value" id="speed">29</label>
+                </div>
+                <div class="statusAndSkillRow">
+                  <label class="value" id="def">29</label>
+                </div>
+                <div class="statusAndSkillRow">
+                  <label class="value" id="mdf">29</label>
+                </div>
+                <div class="statusAndSkillRow">
+                  <label class="value" id="">9999</label>
+                </div>
+                <div class="statusAndSkillRow">
+                  <label class="value" id="">6000</label>
+                </div>
+            </div>
+            
+            <div class="rightText" style="width:200px;display:inline-block">
+                <div class="statusAndSkillRow">
+                  <label class="value" id="weapon">武器</label>
+                </div>
+                <div class="statusAndSkillRow">
+                  <label class="value" id="skillS">辅助技能</label>
+                </div>
+                <div class="statusAndSkillRow">
+                  <label class="value" id="skillE">必杀技能</label>
+                </div>
+                <div class="statusAndSkillRow">
+                  <label class="value" id="skillA">被动技能1</label>
+                </div>
+                <div class="statusAndSkillRow">
+                  <label class="value" id="skillB">被动技能1</label>
+                </div>
+                <div class="statusAndSkillRow">
+                  <label class="value" id="skillC">被动技能1</label>
+                </div>
+                <div class="statusAndSkillRow">
+                  <label class="value" id="skillD">被动技能1</label>
+                </div>
+            </div>
+        </div>
+        
+        <div class="statusAndSkillRow">
+          <button type="button" onclick="openDetail()">更新</button>
+          <button type="button" onclick="download()">下载图片</button>
+        </div>
+      </div>
+
+      <div id='bottomBtnArea'>
+
+      </div>
+    </div>
+  </main>
+</body>
+
+</html>
