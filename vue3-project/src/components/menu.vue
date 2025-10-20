@@ -39,7 +39,7 @@ onMounted(async function(){
                 <span>Test</span>
             </template>
             <el-menu-item>
-                <router-link to="/mainFrame/management/FIREEMBLEM_HERO1122">Firemenblem121</router-link>
+                <router-link to="/mainFrame/management/FIREEMBLEM_HERO">Firemenblem121</router-link>
             </el-menu-item>
         </el-sub-menu>
     </el-menu>

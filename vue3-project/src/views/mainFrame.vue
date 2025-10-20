@@ -20,5 +20,6 @@ import menuComp from '../components/menu.vue'
     width: 100%;height: 94vh;
     position: fixed;
     left: 200px;
+    display: block;
 }
 </style>
