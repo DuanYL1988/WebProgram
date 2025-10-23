@@ -1,0 +1,89 @@
+/* 基础大小 */
+html {
+  font-size: 62.5%;
+  align-items: center;
+}
+
+/* ===================== 顶部start =====================*/
+
+/* ===================== 脚部 ===================== */
+
+/* ===================== 主窗体start=====================*/
+
+
+.block {
+  margin-right: 1em;
+  background: #416c474d;
+  border-radius: 10px;
+  float: left;
+  min-height : 5em;
+  padding-bottom: 15px;
+  text-align: center;
+}
+
+.main > .block > table {
+  width: 90%;
+  margin-left : 20px
+}
+
+.main > .block > p {
+  font-size: 20px;
+  color: red;
+}
+
+/* ===================== 主窗体 end =====================*/
+
+/* ===================== 基础输入元素start=====================*/
+
+/* ===================== 基础输入元素 end =====================*/
+
+/* ===================== 按钮start=====================*/
+
+/* ===================== 按钮 end =====================*/
+
+/* ===================== table列表start=====================*/
+
+/* ===================== table列表 end =====================*/
+
+/* ===================== 菜单start=====================*/
+
+/* ===================== 菜单 end =====================*/
+
+/* ===================== 输入区域行start=====================*/
+.inputRow {
+  display: flex;
+  padding-left: 20px;
+  flex-flow: row wrap;
+  margin-top: 10px;
+}
+
+/* 输入区域一行中单独元素 Div */
+.inputCell {
+  display: flex;
+  min-width: 40px;
+  padding-top: 10px;
+  padding-right: 15px;
+}
+
+.inputCell>span {
+  min-width: 100px;
+  font-size: 15px;
+  margin-top: 10px;
+}
+
+.nessary::after {
+  content : ' * ';
+  color: red;
+}
+
+/* 竖向排列 */
+.vertical .inputCell {
+  display: block;
+}
+
+/* 输入元素中央对齐 */
+.centerContent {
+  margin: 0 auto;
+}
+
+/* =====================  输入区域行end =====================*/

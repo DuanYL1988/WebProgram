@@ -27,23 +27,7 @@ a,
   border: solid 1px black;
 }
 
-/** BASE様式 */
-.block {
-  margin-top: 10px
-}
-
-.cell {
-  display: inline-block
-}
-
-/** BASE様式-END */
-
 /* ===================== 基础输入元素start=====================*/
-.el-select {
-  height: 30px!important;
-  width: 145px;
-  border: 1px solid #949494;
-  border-radius: 5px;
-}
+
 
 /* ===================== 基础输入元素 end =====================*/

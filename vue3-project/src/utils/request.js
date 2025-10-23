@@ -1,4 +1,6 @@
 import axios from 'axios'
+import { alertProps } from 'element-plus';
+import { ElMessage } from 'element-plus'
 const instance = axios.create({baseURL:"/api"});// 
 
 // 添加响应拦截器
@@ -22,6 +24,7 @@ instance.interceptors.response.use(
     },
     err=>{
         console.error(err);
+        ElMessage({message:err.message, type:'error'})
         return Promise.reject(err); // 异步的状态转化为失败的状态
     }
 )
