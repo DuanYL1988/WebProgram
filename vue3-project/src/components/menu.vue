@@ -16,7 +16,7 @@ onMounted(async function(){
 <template>
     <div id="leftMenu">
     <el-menu class="el-menu-vertical-demo">
-        <el-sub-menu :key="`pmenu`+index" :inded="`pmenu`+index" v-for="(childList, parentMenu, index) in menuList">
+        <el-sub-menu :key="`pmenu`+index" :index="`pmenu`+index" v-for="(childList, parentMenu, index) in menuList">
             <template #title>
                 <el-icon></el-icon>
                 <span>{{ parentMenu }}</span>
@@ -33,7 +33,7 @@ onMounted(async function(){
                 </el-menu-item>
             </template>
         </el-sub-menu>
-        <el-sub-menu >
+        <el-sub-menu index="`pmenu99">
             <template #title>
                 <el-icon></el-icon>
                 <span>Test</span>
