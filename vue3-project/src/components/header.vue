@@ -19,7 +19,7 @@ export default {
 <style scoped>
 #topMenu {
     width: 100%;
-    height: 6vh;
+    height: 7rem;
     background-color: #97f2ff
 }
 

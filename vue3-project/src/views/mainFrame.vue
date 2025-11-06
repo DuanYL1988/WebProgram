@@ -21,5 +21,6 @@ import menuComp from '../components/menu.vue'
     position: fixed;
     left: 200px;
     display: block;
+    padding: 5px;
 }
 </style>

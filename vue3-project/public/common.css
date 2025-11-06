@@ -13,7 +13,7 @@ html {
 
 .block {
   margin-right: 1em;
-  background: #416c474d;
+  width:80%;
   border-radius: 10px;
   float: left;
   min-height : 5em;

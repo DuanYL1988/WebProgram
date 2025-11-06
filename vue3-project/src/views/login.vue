@@ -1,5 +1,6 @@
 <script>
 import request from "@/utils/request";
+import alertMessage from "@/utils/message"
 export default {
   data() {
     return {
@@ -35,8 +36,10 @@ export default {
       }
     },
     routeMenu: function () {
-      
     },
+    test:function(){
+      alertMessage("success", "testMsg")
+    }
   },
 };
 </script>
@@ -66,6 +69,7 @@ export default {
         <el-form-item>
           <el-button type="primary" @click="login()" v-if="!registFlag">登录</el-button>
           <el-button type="primary" @click="routeMenu()">静态html</el-button>
+          <el-button type="primary" @click="test()">TEST</el-button>
         </el-form-item>
       </el-form>
     </div>

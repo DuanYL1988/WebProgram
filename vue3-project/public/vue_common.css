@@ -23,6 +23,12 @@ thead .el-table__cell {
   line-height: normal !important;
 }
 
+/* 分页组件 */
+.el-pagination {
+  margin: 10px 20px 0px 0px;
+  float: right;
+}
+
 /* 对话框主体没有间隔 */
 .el-dialog__body {
   padding: 0px 0px 0 0 !important
@@ -51,10 +57,10 @@ thead .el-table__cell {
 }
 
 /* 输入框 */
-.el-input,.el-select{
+.inputCell>.el-input,.el-select{
   min-width:235px!important;
 }
 
-.el-select__wrapper {
+.inputCell>.el-select__wrapper {
   height:35px;
 }
