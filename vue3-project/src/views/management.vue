@@ -63,11 +63,24 @@ export default {
 			let result = []
 			let start = (this.pageNo - 1) * this.pageSize
 			for(let i = start; i < start + this.pageSize; i++) {
-				result.push(this.searchDataList[i])
+        if(i < this.searchDataList.length) {
+          result.push(this.searchDataList[i])
+        }
 			}
       console.debug(result)
 			return result
-		}
+		},
+    tableWidth:function(){
+      let result = 200
+      $.each(this.result.filterColumns,(index, column)=>{
+        if (column.colListDisableFlag == "1"){
+          result += parseInt(column.colListWidth)
+        }
+      })
+      console.debug("table width:",result)
+      let style = "width:" + result * 2 + "px"
+      return style;
+    }
 	},
   /* 初始化 */
   async mounted(){
@@ -82,7 +95,6 @@ export default {
     tableName:{
       handler(newVal, oldVal) {
         if(newVal !== oldVal) {
-          
           this.init();
         }
       },
@@ -93,41 +105,61 @@ export default {
 </script>
 
 <template>
-{{tableName}}
   <div class="block">
-    <div class="cell" :key="`column`+index" v-for="column in result.filterColumns">
-      <span>{{column.colNameCh}}</span>
-      <el-select v-if="'select'==column.colInputtype" v-model="condition[column.colCamel]">
-        <el-option value=""></el-option>
-        <el-option class="center" v-for="master in result.direct[column.colCode]" :value="master.code" :label="master.value">
-          <img class="selectIcon" :src="result.config.imgUrl + master.imgUrl"/>{{master.value}}
-        </el-option>
-      </el-select>
-      <el-radio-group v-else-if="'radio'==column.colInputtype" v-model="condition[column.colCamel]">
-        <el-radio-button v-for="master in result.direct[column.colCode]" :label="master.code" >
-					  <img class="selectIcon" :src="result.config.imgUrl + master.imgUrl"/>
-			  </el-radio-button>
-      </el-radio-group>
-      <el-switch v-else-if="'flag'==column.colInputtype" v-model="condition[column.colCamel]" active-value="1" inactive-value="0"></el-switch>
-      <el-input v-else v-model="condition[column.colCamel]"></el-input>
+    <div class="inputRow">{{tableName}}</div>
+    <div class="inputRow">
+      <div class="inputCell" :key="`column`+index" v-for="column in result.filterColumns">
+        <span>{{column.colNameCh}}</span>
+        <el-select v-if="'select'==column.colInputtype" v-model="condition[column.colCamel]">
+          <el-option value=""></el-option>
+          <el-option class="center" v-for="master in result.direct[column.colCode]" :value="master.code" :label="master.value">
+            <img v-if="''!==master.imgUrl" class="selectIcon" :src="result.config.imgUrl + master.imgUrl"/>{{master.value}}
+          </el-option>
+        </el-select>
+        <el-select v-if="'NAME'==column.colName" filterable v-model="condition[column.colCamel]">
+          <el-option value=""></el-option>
+          <el-option class="center" v-for="master in result.direct[column.colName]" :value="master.code" :label="master.value">
+            {{master.value}}
+          </el-option>
+        </el-select>
+        <el-radio-group v-else-if="'radio'==column.colInputtype" v-model="condition[column.colCamel]">
+          <el-radio-button size="small" v-for="master in result.direct[column.colCode]" :label="master.code" >
+              <img v-if="``!==master.imgUrl" class="selectIcon" :src="result.config.imgUrl + master.imgUrl"/>
+              <span v-else style="font-size:large">{{master.value}}</span>
+          </el-radio-button>
+        </el-radio-group>
+        <el-switch v-else-if="'flag'==column.colInputtype" v-model="condition[column.colCamel]" active-value="1" inactive-value="0"></el-switch>
+        <el-input v-else-if="'text'==column.colInputtype" v-model="condition[column.colCamel]"></el-input>
+      </div>
     </div>
-    <el-button type="primary" @click="doSearch()">检索</el-button>
+    <div class="inputRow">
+      <div class="inputCell">
+      <span>自定义条件</span>
+        <el-input v-model="condition['condition']" style="width:450px!important"></el-input>
+      </div>
+      <div class="inputCell">
+        <el-button type="primary" style="width:80px" @click="doSearch()">检索</el-button>
+      </div>
+    </div>
   </div>
     
-  <div v-if="searchDataList.length > 0" class="block">
+  <div v-if="searchDataList.length > 0" :style="tableWidth" class="block">
     <el-table :data="displayList" border >
         <el-table-column width="70" fixed="left" label="头像">
-          <template #default="scope"><el-avatar :size="50" :src="getFaceImgUrl(scope.row)"></el-avatar></template>
+          <template #default="scope"><el-avatar size="50" :src="getFaceImgUrl(scope.row)"></el-avatar></template>
         </el-table-column>
         <!-- 通用一览表示 -->
         <template v-for="column in result.listColumns">
-            <el-table-column v-if="'select'== column.colInputtype || 'radio'== column.colInputtype" :width="120" fixed="left" :label="column.colNameCh">
+            <el-table-column v-if="'select'== column.colInputtype || 'radio'== column.colInputtype" :width="column.colListWidth" fixed="left" :label="column.colNameCh">
                 <template #default="scope">{{getDirection(result.direct[column.colCode],scope.row[column.colCamel])}}</template>
             </el-table-column>
-            <el-table-column v-else :width="120" fixed="left" :label="column.colNameCh">
+            <el-table-column v-else :width="column.colListWidth" :label="column.colNameCh">
                 <template #default="scope">{{scope.row[column.colCamel]}}</template>
             </el-table-column>
         </template>
+        <el-table-column width="150" label="操作">
+            <template #default="scope"></template>
+        </el-table-column>
     </el-table>
     <el-pagination 
               v-model:current-page="pageNo" 
