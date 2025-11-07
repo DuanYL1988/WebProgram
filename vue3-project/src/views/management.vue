@@ -1,6 +1,6 @@
 <script>
 import SearchComp from "../components/searchComp.vue"
-import request from "@/utils/request";
+import Utils from "@/utils/request";
 export default {
   components: {SearchComp},
   data() {
@@ -63,7 +63,7 @@ export default {
         alert("请设置检索条件!")
       } else {
         let url = "/" + this.tableName + "/getList"
-        let response = await request.post(url, searchCondition);
+        let response = await Utils.request.post(url, searchCondition);
         if(200 == response?.code){
           this.searchDataList = response.data
         }
@@ -114,7 +114,7 @@ export default {
       }
       console.debug(requestBody)
       let url = "/" + this.tableName + "/updatePickup"
-      let response = await request.post(url, requestBody);
+      let response = await Utils.request.post(url, requestBody);
       console.debug(JSON.stringify(response.message))
       // 初始化条件
       this.idValMp = {}

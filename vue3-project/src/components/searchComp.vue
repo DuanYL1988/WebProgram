@@ -52,22 +52,22 @@ export default {
   <div class="block">
     <div class="inputRow">{{tableName}}</div>
     <div class="inputRow">
-      <div class="inputCell" :key="`column`+index" v-for="column in result.filterColumns">
+      <div class="inputCell" v-for="column in result.filterColumns" :key="`columnIndex`+column.colCamel">
         <span>{{column.colNameCh}}</span>
         <el-select class="imgSelect" v-if="'select'==column.colInputtype" v-model="condition[column.colCamel]">
           <el-option value=""></el-option>
-          <el-option class="center" v-for="master in result.direct[column.colCode]" :value="master.code" :label="master.value">
+          <el-option class="center" v-for="master in result.direct[column.colCode]" :value="master.code" :label="master.value" :key="`MSTINFO`+master.code">
             <img v-if="''!==master.imgUrl" class="selectIcon" :src="result.config.imgUrl + master.imgUrl"/>{{master.value}}
           </el-option>
         </el-select>
         <el-select v-if="'NAME'==column.colName" filterable v-model="condition[column.colCamel]">
           <el-option value=""></el-option>
-          <el-option class="center" v-for="master in result.direct[column.colName]" :value="master.code" :label="master.value">
+          <el-option class="center" v-for="master in result.direct[column.colName]" :value="master.code" :label="master.value" :key="`MSTINFO`+master.code">
             {{master.value}}
           </el-option>
         </el-select>
         <el-radio-group v-else-if="'radio'==column.colInputtype" v-model="condition[column.colCamel]">
-          <el-radio-button size="small" v-for="master in result.direct[column.colCode]" :label="master.code" >
+          <el-radio-button size="small" v-for="master in result.direct[column.colCode]" :label="master.code" :key="`MSTINFO`+master.code">
               <img v-if="``!==master.imgUrl" class="selectIcon" :src="result.config.imgUrl + master.imgUrl"/>
               <span v-else style="font-size:large">{{master.value}}</span>
           </el-radio-button>
