@@ -1,5 +1,5 @@
 <script>
-import request from "@/utils/request";
+import Utils from "@/utils/request";
 export default {
   data() {
     return {
@@ -12,7 +12,7 @@ export default {
     async init(){
       this.result = {}
       this.condition= {}
-      let result = await request.get("/getFilterColumns?tableName="+this.tableName);
+      let result = await Utils.request.get("/getFilterColumns?tableName="+this.tableName);
       if(200 == result?.code){
         this.result = result.data
         this.$emit('initResult', result.data);

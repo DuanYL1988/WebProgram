@@ -10,9 +10,14 @@ export default {
       searchDataList:[],
       pageSize:10,
 			pageNo:1,
-      actionTdWidth:150
+      actionTdWidth:150,
+      idValMp:{}
     };
   },
+    /* 初始化 */
+    mounted(){
+      this.init();
+    },
   /* 計算屬性 */
   computed: {
 		displayList:function(){
@@ -20,14 +25,13 @@ export default {
 			let start = (this.pageNo - 1) * this.pageSize
 			for(let i = start; i < start + this.pageSize; i++) {
         if(i < this.searchDataList.length) {
-          console.debug(i)
           result.push(this.searchDataList[i])
         }
 			}
 			return result
 		},
     tableWidth:function(){
-      let result = this.actionTdWidth
+      let result = this.actionTdWidth + 5
       $.each(this.result.filterColumns,(index, column)=>{
         if (column.colListDisableFlag == "1"){
           result += parseInt(column.colListWidth)
@@ -38,10 +42,6 @@ export default {
       return style;
     }
 	},
-  /* 初始化 */
-  mounted(){
-    this.init();
-  },
   /* 監視器 */
   watch:{
     '$route.params.tablename'(newVal) {
@@ -55,6 +55,7 @@ export default {
       this.searchDataList=[]
       this.pageSize=10
       this.pageNo=1
+      this.idValMp={}
     },
     async doSearch(searchCondition){
       let keys = Object.keys(searchCondition)
@@ -94,43 +95,74 @@ export default {
     handleCurrentChange:function(val){
         this.pageNo = val
     },
+    updateFlag: function(rowData,columnNm){
+      this.idValMp[rowData.id] = rowData[columnNm]
+    },
+    updateColumns:async function(){
+      let ids = []
+      let values = []
+      $.each(this.idValMp,(key,val)=>{
+        ids.push(key)
+        values.push(val)
+      })
+      let requestBody = {
+        "tableName": this.tableName,
+        "tgtColNm": "PICK_FLAG",
+        "condColNm": "ID",
+        "ids": ids,
+        "values": values
+      }
+      console.debug(requestBody)
+      let url = "/" + this.tableName + "/updatePickup"
+      let response = await request.post(url, requestBody);
+      console.debug(JSON.stringify(response.message))
+      // 初始化条件
+      this.idValMp = {}
+    }
   },
 };
 </script>
 
 <template>
   <SearchComp @childParam="doSearch" @initResult="result = $event"/>
-
-  <el-button @click="init()">Test</el-button>
-    
-  <div v-if="searchDataList.length > 0" :style="tableWidth" class="block">
-    <el-table :data="displayList" border >
-        <el-table-column width="70" fixed="left" label="头像">
-          <template #default="scope"><el-avatar size="50" :src="getFaceImgUrl(scope.row)"></el-avatar></template>
-        </el-table-column>
-        <!-- 通用一览表示 -->
-        <template v-for="column in result.listColumns">
-            <el-table-column v-if="'select'== column.colInputtype || 'radio'== column.colInputtype" :width="column.colListWidth" :label="column.colNameCh">
-                <template #default="scope">{{getDirection(result.direct[column.colCode],scope.row[column.colCamel])}}</template>
-            </el-table-column>
-            <el-table-column v-else :width="column.colListWidth" :label="column.colNameCh">
-                <template #default="scope">{{scope.row[column.colCamel]}}</template>
-            </el-table-column>
-        </template>
-        <el-table-column :width="actionTdWidth" fixed="right" label="操作">
-            <template #default="scope"></template>
-        </el-table-column>
-    </el-table>
+   
+  <div v-if="searchDataList.length > 0" style="height:80%;" class="block">
+    <div style="max-height:90%;overflow-y:scroll">
+      <el-table :style="tableWidth" :data="displayList" border >
+          <el-table-column width="70" fixed="left" label="头像">
+            <template #default="scope"><el-avatar size="50" :src="getFaceImgUrl(scope.row)"></el-avatar></template>
+          </el-table-column>
+          <!-- 通用一览表示 -->
+          <template v-for="column in result.listColumns">
+              <el-table-column v-if="'select'== column.colInputtype || 'radio'== column.colInputtype" :width="column.colListWidth" :label="column.colNameCh" :key="`colTd`+column.colCamel">
+                  <template #default="scope">{{getDirection(result.direct[column.colCode],scope.row[column.colCamel])}}</template>
+              </el-table-column>
+              <el-table-column v-else-if="'flag'== column.colInputtype" :width="column.colListWidth" :label="column.colNameCh" :key="`colTd`+column.colCamel">
+                  <template #default="scope">
+                    <el-switch v-model="scope.row[column.colCamel]" active-value="1" inactive-value="0" @change="updateFlag(scope.row,column.colCamel)" />
+                  </template>
+              </el-table-column>
+              <el-table-column v-else :width="column.colListWidth" :label="column.colNameCh" :key="`colTd`+column.colCamel">
+                  <template #default="scope">{{scope.row[column.colCamel]}}</template>
+              </el-table-column>
+          </template>
+          <el-table-column :width="actionTdWidth" fixed="right" label="操作">
+              <template #default="scope"></template>
+          </el-table-column>
+      </el-table>
+    </div>
     <el-pagination 
               v-model:current-page="pageNo" 
               v-model:page-size="pageSize" 
-              :page-sizes="[5, 10, 15, 20]" 
+              :page-sizes="[5, 10, 15, 20,500]" 
               layout="total, sizes, prev, pager, next, jumper" 
               :total="searchDataList.length"
               :default-page-size="5"
               @size-change="handleSizeChange"
               @current-change="handleCurrentChange">
     </el-pagination>
+   
+    <el-button @click="updateColumns()">Test</el-button>
   </div>
 </template>
 

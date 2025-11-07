@@ -1,11 +1,11 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import request from '@/utils/request'
+import Utils from '@/utils/request'
 var menuList = ref({})
 // 初期
 onMounted(async function(){
     console.log("取得menu list")
-    let result = await request.post("/getMenuList");
+    let result = await Utils.request.post("/getMenuList");
     console.log(result)
     if(200 == result?.code){
         menuList.value = result.data["menuGroup"]

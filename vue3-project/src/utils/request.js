@@ -1,10 +1,9 @@
 import axios from 'axios'
-import { alertProps } from 'element-plus';
 import { ElMessage } from 'element-plus'
-const instance = axios.create({baseURL:"/api"});// 
+const request = axios.create({baseURL:"/api"});// 
 
 // 添加响应拦截器
-instance.interceptors.request.use(
+request.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem('vue_jwt_token')
         if(token) {
@@ -18,7 +17,7 @@ instance.interceptors.request.use(
     }
 )
 
-instance.interceptors.response.use(
+request.interceptors.response.use(
     result=>{
         return result.data;
     },
@@ -29,4 +28,11 @@ instance.interceptors.response.use(
     }
 )
 
-export default instance;
+const alertMessage = (messageStr,typeStr) => {
+    ElMessage({
+        message: messageStr,
+        type:typeStr
+    })
+}
+
+export default {request,alertMessage};

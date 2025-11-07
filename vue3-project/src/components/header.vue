@@ -1,15 +1,12 @@
-<script>
-export default {
-    props: {
-        title: { type: String, default: "" },
-        faceImg: { type: String, default: "https://static.wikia.nocookie.net/feheroes_gamepedia_en/images/9/9e/Nerthuz_God_of_the_Land_Face_FC.webp" },
-    },
-}
+<script setup>
+const userInfo = localStorage.getItem("userinfo")
+const faceImg = userInfo
+
 </script>
 
 <template>
     <div id="topMenu">
-        <span class="title">{{ title }}</span>
+        <span class="title"></span>
         <div id="faceImg">
             <img class="faceImg" :src="faceImg"/>
         </div>

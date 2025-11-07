@@ -9,24 +9,22 @@ html {
 /* ===================== 脚部 ===================== */
 
 /* ===================== 主窗体start=====================*/
-
-
 .block {
   margin-right: 1em;
-  width:80%;
+  width: 80%;
   border-radius: 10px;
   float: left;
-  min-height : 5em;
+  min-height: 5em;
   padding-bottom: 15px;
   text-align: center;
 }
 
-.main > .block > table {
+.main>.block>table {
   width: 90%;
-  margin-left : 20px
+  margin-left: 20px
 }
 
-.main > .block > p {
+.main>.block>p {
   font-size: 20px;
   color: red;
 }
@@ -34,6 +32,16 @@ html {
 /* ===================== 主窗体 end =====================*/
 
 /* ===================== 基础输入元素start=====================*/
+/* 下拉列表前有图片元素 */
+.center {
+  display: flex;
+  align-items: center;
+}
+.selectIcon {
+  width: 25px;
+  height: 25px;
+  margin-right: 10px;
+}
 
 /* ===================== 基础输入元素 end =====================*/
 
@@ -72,7 +80,7 @@ html {
 }
 
 .nessary::after {
-  content : ' * ';
+  content: ' * ';
   color: red;
 }
 
