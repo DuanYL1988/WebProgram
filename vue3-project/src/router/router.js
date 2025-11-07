@@ -4,6 +4,7 @@ import {createRouter,createWebHashHistory} from 'vue-router'
 import loginComp from '../views/login.vue'
 import mainFrameComp from '../views/mainFrame.vue'
 import managementComp from '../views/management.vue'
+import systemConfComp from '../views/systemconf.vue'
 
 // 创建路由对象
 const router = createRouter({
@@ -16,7 +17,8 @@ const router = createRouter({
         {path:'/login' , component:loginComp},
         {path:'/mainFrame',name:'mainFrame',component:mainFrameComp
          ,children:[
-            {path:'management/:tablename', component:managementComp, props:true}
+            {path:'management/:tablename', component:managementComp, props:true},
+            {path:'systemconf', component:systemConfComp, props:true}
          ]
         }
     ],
