@@ -5,8 +5,15 @@ import SwitchTd from '../elementComp/switchTdComp.vue'
 import InputTd from '../elementComp/inputTdComp.vue'
 
 var tableList = ref([])
-var tableName = ref("")
+var tblCond = ref({"tableName":"FGO_SERVANT", "colFifterable":"", "colListDisableFlag":""})
 var columnList = ref([])
+var updateColMp = ref({})
+const COLUMN_MP = {
+    "colFifterable" : "COL_FIFTERABLE"
+    , "colListDisableFlag" : "COL_LIST_DISABLE_FLAG"
+    , "colListWidth" : "COL_LIST_WIDTH"
+    , "colSort" : "COL_SORT"
+}
 onMounted(async() => {
     console.debug("System Page Onload!!")
     let response = await Utils.request.get("/systemconf/tableEdit")
@@ -14,19 +21,46 @@ onMounted(async() => {
     tableList.value = response.data.tableList
 })
 
-async function showColumnsInfo(){
-    if(isEmpty(tableName.value)) {
+function showColumnsInfo(){
+    if(isEmpty(tblCond.value["tableName"])) {
         Utils.alertMessage("请选择表", "error")
         return
     }
-    let url = "/systemconf/getColumnListByTblnm?tableName=" + tableName.value
-    let response = await Utils.request.get(url)
-    console.debug(response)
-    columnList.value = response.data
+    let cond = {"tableName":tblCond.value["tableName"]}
+    if ("1" == tblCond.value["colFifterable"]) {
+        cond["colFifterable"] = "1"
+    }
+    if ("1" == tblCond.value["colListDisableFlag"]) {
+        cond["colListDisableFlag"] = "1"
+    }
+    Utils.request.post("/systemconf/getColumnListByTblnm",cond).then((response)=>{
+        columnList.value = response.data
+    })
 }
 
 function changeColVal(row,prop){
-    Utils.alertMessage(row[prop],"info")
+    let tempMp = updateColMp.value
+    if (isEmpty(tempMp[prop])) {
+        tempMp[prop] = {
+            "tgtColNm": COLUMN_MP[prop]
+            , "valuesMp" : {}
+        }
+    }
+    tempMp[prop]["valuesMp"][row["id"]] = row[prop]
+    updateColMp.value = tempMp
+    console.debug(updateColMp.value[prop])
+}
+
+function updateRows(){
+    $.each(updateColMp.value, async (prop,dirtObj)=>{
+        let updateDto = {"tableName":"TABLE_INFO", "condColNm": "ID", "tgtColNm": dirtObj["tgtColNm"], "ids": [], "values": []}
+        $.each(dirtObj["valuesMp"],(id,val)=>{
+            updateDto["ids"].push(id)
+            updateDto["values"].push(val)
+        })
+        let response = await Utils.request.post('/systemconf/updateColumnValues',updateDto)
+        Utils.alertMessage(response.message,"success")
+    })
 }
 
 </script>
@@ -35,9 +69,17 @@ function changeColVal(row,prop){
         <div class="inputRow">
             <div class="inputCell">
                 <span>选择表</span>
-                <el-select class="tableNamePulldown" v-model="tableName">
+                <el-select class="tableNamePulldown" v-model="tblCond.tableName">
                     <el-option v-for="tblInfo in tableList" :value="tblInfo.code" :label="tblInfo.value" :key="`index`+tblInfo.code"/>
                 </el-select>
+            </div>
+            <div class="inputCell">
+                <span>检索条件Flag</span>
+                <el-switch v-model="tblCond.colFifterable" active-value="1" inactive-value=""/>
+            </div>
+            <div class="inputCell">
+                <span>一览表示Flag</span>
+                <el-switch v-model="tblCond.colListDisableFlag" active-value="1" inactive-value=""/>
             </div>
             <div class="inputCell">
                 <el-button type="primary" @click="showColumnsInfo()">查看字段配置</el-button>
@@ -49,15 +91,15 @@ function changeColVal(row,prop){
         <el-table :data="columnList" v-if="columnList.length > 0" border>
             <el-table-column prop="colNameCh" width="160" label="字段名"/>
             <el-table-column prop="colInputtype" width="100" label="输入类型"/>
-            <SwitchTd prop="colFifterable" label="检索条件flag" :width="120" @switch-change="()=>changeColVal"/>
-            <el-table-column prop="colCode" width="130" label="MASTER_CODE"/>
+            <SwitchTd prop="colFifterable" label="检索条件flag" :width="120" @switch-change="changeColVal"/>
+            <InputTd prop="colCode" label="MASTER_CODE" :width="130" numberFlag="False" @input-mouseout="changeColVal" />
             <SwitchTd prop="colListDisableFlag" label="一览表示flag" :width="120" />
-            <InputTd prop="colListWidth" label="一览宽度" :width="150" :step="10" numberFlag="True" />
-            <InputTd prop="colSort" label="排序" :width="120" :step="1" numberFlag="True" />
+            <InputTd prop="colListWidth" label="一览宽度" :width="150" :step="10" numberFlag="True" @input-mouseout="changeColVal" />
+            <InputTd prop="colSort" label="排序" :width="120" :step="1" numberFlag="True" @input-mouseout="changeColVal" />
         </el-table>
     </div>
     <div class="block">
-        <el-button style="float:left" type="primary">批量更新</el-button>
+        <el-button style="float:left" type="primary" @click="updateRows">批量更新</el-button>
     </div>
 </template>
 <style scoped>

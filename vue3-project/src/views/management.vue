@@ -1,8 +1,10 @@
 <script>
-import SearchComp from "../components/searchComp.vue"
+import SearchComp from "@/components/searchComp.vue"
+import FaceTdComp from "@/elementComp/faceTdComp.vue"
+import TagTdComp from "@/elementComp/tagTdComp.vue";
 import Utils from "@/utils/request";
 export default {
-  components: {SearchComp},
+  components: {SearchComp,FaceTdComp,TagTdComp},
   data() {
     return {
       tableName: this.$route.params.tablename,
@@ -14,10 +16,10 @@ export default {
       idValMp:{}
     };
   },
-    /* 初始化 */
-    mounted(){
-      this.init();
-    },
+  /* 初始化 */
+  mounted(){
+    this.init();
+  },
   /* 計算屬性 */
   computed: {
 		displayList:function(){
@@ -31,14 +33,14 @@ export default {
 			return result
 		},
     tableWidth:function(){
-      let result = this.actionTdWidth + 5
-      $.each(this.result.filterColumns,(index, column)=>{
+      let result = 0
+      $.each(this.result.listColumns,(index, column)=>{
         if (column.colListDisableFlag == "1"){
           result += parseInt(column.colListWidth)
         }
       })
       console.debug("table width:",result)
-      let style = "width:" + result * 2 + "px"
+      let style = result * 2 + this.actionTdWidth + 5 + "px}"
       return style;
     }
 	},
@@ -63,19 +65,13 @@ export default {
         alert("请设置检索条件!")
       } else {
         let url = "/" + this.tableName + "/getList"
+        console.debug(url)
+        console.debug("cond:" + JSON.stringify(searchCondition))
         let response = await Utils.request.post(url, searchCondition);
         if(200 == response?.code){
           this.searchDataList = response.data
         }
       }
-    },
-    getFaceImgUrl(rowData) {
-        let imageUrl = ""
-        // 规则
-        if("FIREEMBLEM_HERO" == this.tableName) {
-          imageUrl = this.result.config.imgUrl + rowData.faceImg + rowData.imgName.replace("'","") + "_Face_FC.webp"
-        }
-        return imageUrl
     },
     getDirection(codeList,code){
         let result = code
@@ -105,6 +101,9 @@ export default {
         ids.push(key)
         values.push(val)
       })
+      if (ids.length == 0 || ids.length !== values.length) {
+        Utils.warningMsg
+      }
       let requestBody = {
         "tableName": this.tableName,
         "tgtColNm": "PICK_FLAG",
@@ -113,8 +112,7 @@ export default {
         "values": values
       }
       console.debug(requestBody)
-      let url = "/" + this.tableName + "/updatePickup"
-      let response = await Utils.request.post(url, requestBody);
+      let response = await Utils.request.post("systemconf/getColumnListByTblnm", requestBody);
       console.debug(JSON.stringify(response.message))
       // 初始化条件
       this.idValMp = {}
@@ -128,21 +126,20 @@ export default {
    
   <div v-if="searchDataList.length > 0" style="height:80%;" class="block">
     <div style="max-height:90%;overflow-y:scroll">
-      <el-table :style="tableWidth" :data="displayList" border >
-          <el-table-column width="70" fixed="left" label="头像">
-            <template #default="scope"><el-avatar size="50" :src="getFaceImgUrl(scope.row)"></el-avatar></template>
-          </el-table-column>
+      <el-table :style="{'width':tableWidth}" :data="displayList" border stripe >
+          <FaceTdComp :tableName="tableName" :baseUrl="result.config.imgUrl" />
           <!-- 通用一览表示 -->
           <template v-for="column in result.listColumns">
               <el-table-column v-if="'select'== column.colInputtype || 'radio'== column.colInputtype" :width="column.colListWidth" :label="column.colNameCh" :key="`colTd`+column.colCamel">
                   <template #default="scope">{{getDirection(result.direct[column.colCode],scope.row[column.colCamel])}}</template>
               </el-table-column>
-              <el-table-column v-else-if="'flag'== column.colInputtype" :width="column.colListWidth" :label="column.colNameCh" :key="`colTd`+column.colCamel">
+              <el-table-column v-else-if="'flag'== column.colInputtype" :width="column.colListWidth" :label="column.colNameCh">
                   <template #default="scope">
                     <el-switch v-model="scope.row[column.colCamel]" active-value="1" inactive-value="0" @change="updateFlag(scope.row,column.colCamel)" />
                   </template>
               </el-table-column>
-              <el-table-column v-else :width="column.colListWidth" :label="column.colNameCh" :key="`colTd`+column.colCamel">
+              <TagTdComp v-else-if="'tag'== column.colInputtype" :label="column.colNameCh" :prop="column.colCamel" />
+              <el-table-column v-else :width="column.colListWidth" :label="column.colNameCh">
                   <template #default="scope">{{scope.row[column.colCamel]}}</template>
               </el-table-column>
           </template>

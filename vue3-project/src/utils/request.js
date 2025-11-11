@@ -9,7 +9,7 @@ request.interceptors.request.use(
         if(token) {
             config.headers.Authorization = token;
         }
-        console.log("拦截器:"+config.headers.Authorization)
+        // console.log("拦截器:"+config.headers.Authorization)
         return config
     },
     error => {
@@ -35,4 +35,16 @@ const alertMessage = (messageStr,typeStr) => {
     })
 }
 
-export default {request,alertMessage};
+const successMsg = (messageStr) => {
+    alertMessage(messageStr,"success")
+}
+
+const errorMsg = (messageStr) => {
+    alertMessage(messageStr,"error")
+}
+
+const warningMsg = (messageStr) => {
+    alertMessage(messageStr,"warning")
+}
+
+export default {request,alertMessage,successMsg,errorMsg,warningMsg};

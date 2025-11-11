@@ -16,6 +16,7 @@ export default {
       if(200 == result?.code){
         this.result = result.data
         this.$emit('initResult', result.data);
+        console.debug(result.data)
       }
     },
     passCondition() {
@@ -67,7 +68,7 @@ export default {
           </el-option>
         </el-select>
         <el-radio-group v-else-if="'radio'==column.colInputtype" v-model="condition[column.colCamel]">
-          <el-radio-button size="small" v-for="master in result.direct[column.colCode]" :label="master.code" :key="`MSTINFO`+master.code">
+          <el-radio-button size="small" v-for="master in result.direct[column.colCode]" :value="master.code" :key="`MSTINFO`+master.code">
               <img v-if="``!==master.imgUrl" class="selectIcon" :src="result.config.imgUrl + master.imgUrl"/>
               <span v-else style="font-size:large">{{master.value}}</span>
           </el-radio-button>

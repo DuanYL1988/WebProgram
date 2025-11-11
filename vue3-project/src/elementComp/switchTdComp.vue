@@ -1,7 +1,7 @@
 <template>
     <el-table-column :label="label" :width="width">
         <template #default="scope">
-            <el-switch v-model="scope.row[prop]" inactive-value="0" active-value="1" @change="()=>handleSwitchChange(scope.row,prop)"/>
+            <el-switch v-model="scope.row[prop]" inactive-value="0" active-value="1" @click="()=>handleSwitchChange(scope.row,prop)"/>
         </template>
     </el-table-column>
 </template>
