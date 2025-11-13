@@ -70,26 +70,12 @@ export default {
         let response = await Utils.request.post(url, searchCondition);
         if(200 == response?.code){
           this.searchDataList = response.data
+          this.pageNo=1
         }
       }
     },
     getDirection(codeList,code){
-        let result = code
-        if(code!=="" && isNotEmpty(codeList)){
-            for(let i = 0; i < codeList.length; i++) {
-              let info = codeList[i]
-              if(info.code === code) {
-                result = info.value
-              }
-            }
-        }
-        return result
-    },
-    handleSizeChange:function(val){
-        this.pageSize = val
-    },
-    handleCurrentChange:function(val){
-        this.pageNo = val
+        return getDirection(codeList,code)
     },
     updateFlag: function(rowData,columnNm){
       this.idValMp[rowData.id] = rowData[columnNm]
@@ -122,7 +108,7 @@ export default {
 </script>
 
 <template>
-  <SearchComp @childParam="doSearch" @initResult="result = $event"/>
+  <SearchComp :tableName="$route.params.tablename" @searchCondition="doSearch" @masterData="result = $event"/>
    
   <div v-if="searchDataList.length > 0" style="height:80%;" class="block">
     <div style="max-height:90%;overflow-y:scroll">
@@ -149,14 +135,14 @@ export default {
       </el-table>
     </div>
     <el-pagination 
-              v-model:current-page="pageNo" 
-              v-model:page-size="pageSize" 
-              :page-sizes="[5, 10, 15, 20,500]" 
-              layout="total, sizes, prev, pager, next, jumper" 
-              :total="searchDataList.length"
-              :default-page-size="5"
-              @size-change="handleSizeChange"
-              @current-change="handleCurrentChange">
+        v-model:current-page="pageNo" 
+        v-model:page-size="pageSize" 
+        :page-sizes="[6,9,15,30]" 
+			  :page-size="pageSize" 
+        :total="searchDataList.length"
+        layout="total, sizes, prev, pager, next, jumper" 
+        @size-change="(val)=>{pageSize = val;pageNo=1}"
+        @current-change="(val)=>{pageNo = val}">
     </el-pagination>
    
     <el-button @click="updateColumns()">Test</el-button>

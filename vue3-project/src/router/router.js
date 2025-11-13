@@ -5,6 +5,7 @@ import loginComp from '../views/login.vue'
 import mainFrameComp from '../views/mainFrame.vue'
 import managementComp from '../views/management.vue'
 import systemConfComp from '../views/systemconf.vue'
+import fehCardComp from '../views/illustration/fireemblemHero.vue'
 
 // 创建路由对象
 const router = createRouter({
@@ -18,7 +19,8 @@ const router = createRouter({
         {path:'/mainFrame',name:'mainFrame',component:mainFrameComp
          ,children:[
             {path:'management/:tablename', component:managementComp, props:true},
-            {path:'systemconf', component:systemConfComp, props:true}
+            {path:'systemconf/TABLE_INFO', component:systemConfComp, props:true},
+            {path:'illustration/FIREEMBLEM_HERO', component:fehCardComp, props:true},
          ]
         }
     ],

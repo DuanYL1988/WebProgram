@@ -81,6 +81,20 @@ function tranColumnToProp(dbColNm, firstUpperFlag) {
     }
     return propertyNm
 }
+
+/* code_master */
+function getDirection(codeList,code){
+    let result = code
+    if(code!=="" && isNotEmpty(codeList)){
+        for(let i = 0; i < codeList.length; i++) {
+          let info = codeList[i]
+          if(info.code === code) {
+            result = info.value
+          }
+        }
+    }
+    return result
+}
 /* ==================== 文字処理 Start ==================== */
 
 /* ==================== 浏览器相关 Start ==================== */

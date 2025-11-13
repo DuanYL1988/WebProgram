@@ -61,10 +61,16 @@ thead .el-table__cell {
 }
 
 /* 输入框 */
-.inputCell>.el-input,.el-select{
+.inputCell>.el-input,.inputCell>.el-select{
   min-width:235px!important;
 }
 
 .inputCell>.el-select__wrapper {
   height:35px;
+}
+
+/* paging */
+.el-pagination__sizes .el-select .el-input {
+  width: auto !important;
+  min-width: 100px;
 }

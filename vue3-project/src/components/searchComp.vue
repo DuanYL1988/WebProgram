@@ -3,55 +3,55 @@ import Utils from "@/utils/request";
 export default {
   data() {
     return {
-      tableName: this.$route.params.tablename,
       result: {},
       condition: {},
     };
+  },
+  props: {
+    tableName: {
+      type: String,
+      required: true
+    }
   },
   methods: {
     async init(){
       this.result = {}
       this.condition= {}
+      console.debug(this.tableName)
       let result = await Utils.request.get("/getFilterColumns?tableName="+this.tableName);
       if(200 == result?.code){
         this.result = result.data
-        this.$emit('initResult', result.data);
+        this.$emit('masterData', result.data);
         console.debug(result.data)
       }
     },
     passCondition() {
-      this.$emit('childParam', this.condition);
+      this.$emit('searchCondition', this.condition);
     },
   },
   /* 計算屬性 */
   computed: {
-
   },
   /* 初始化 */
-  async mounted(){
-    console.debug(this.$route.params);
+  mounted(){
     this.init();
   },
   /* 監視器 */
   watch:{
-    '$route.params.tablename'(newVal) {
-      this.tableName = newVal;
-    },
     tableName:{
       handler(newVal, oldVal) {
         if(newVal !== oldVal) {
           this.init();
         }
-      },
-      deep: true
+      }
     },
   }
 };
 </script>
 
 <template>
-  <div class="block">
-    <div class="inputRow">{{tableName}}</div>
+  <div class="block" style="min-width: 1200px;">
+    <!-- <div class="inputRow">{{tableName}}</div> -->
     <div class="inputRow">
       <div class="inputCell" v-for="column in result.filterColumns" :key="`columnIndex`+column.colCamel">
         <span>{{column.colNameCh}}</span>

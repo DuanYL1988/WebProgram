@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="shortcut icon" href="../../resources/images/feh/PageIcon.png">
+  <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+  <link rel="stylesheet" href="../../resources/common/vue_common.css" />
+  <link rel="stylesheet" href="./cardList.css" />
+  <link rel="stylesheet" href="./singleHero.css" />
+  <style></style>
+  <script src="../../resources/lib/jquery-3.4.1.min.js"></script>
+  <script src="../../resources/common/vue_common.js"></script>
+  <script src="https://unpkg.com/vue@2/dist/vue.js"></script>
+  <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+  <script src="./DBData.json"></script>
+  <script>
+    const IMG_HOST = "https://static.wikia.nocookie.net/feheroes_gamepedia_en/images/"
+  </script>
+</head>
+
+<body>
+  <div id="app">
+    <div class="searchArea" style="margin-left:20px">
+      <el-select size="small" v-model="condition.name">
+        <el-option v-for="item in nameList" :label="item.cn" :value="item.code" :key="item.code">{{item.cn}}</el-option>
+      </el-select>
+    </div>
+    <!-- 头像Card -->
+    <div class="cardList" style="padding-top: 10px">
+      <div v-for="data in displayList" class="card" @click="pickData(data)">
+        <table>
+          <tr>
+            <td class="faceImg" rowspan="4">
+              <img :src="IMG_HOST + data.faceImg + data.imgName.replace(/'/g,'') + '_Face_FC.webp'"></img>
+              <div class="rarity">
+                <img class="rarityStar" v-for="n in parseInt(data.rarity)" :src="`../../resources/images/feh/Icon_Rarity_`+data.rarity+`.png`">
+              </div>
+            </td>
+            <td class="infoStr" colspan="5">
+              <div class="title">{{data.titleName + ":" + data.nameCn}}</div>
+            </td>
+          </tr>
+          <tr>
+            <td class="infoStr " style="font-size:17px;font-style: italic;color: rgb(39 45 76);" colspan="5">
+              <span class="weaponName">{{data.weaponName}}</span>
+            </td>
+          </tr>
+
+          <tr>
+            <td class="infoStr" style="font-size: 17px;" colspan="5"><img class="iconTdImg"
+                :src="data.entryIcon"></img><span>{{data.entry}}</span></td>
+          </tr>
+          <tr style="position: relative;top: -5px;">
+            <td class="infoStr">HP:{{data.hp}}</td>
+            <td class="infoStr">POW:{{data.atk}}</td>
+            <td class="infoStr">SPD:{{data.spd}}</td>
+            <td class="infoStr">DEF:{{data.def}}</td>
+            <td class="infoStr">RES:{{data.res}}</td>
+          </tr>
+          <tr style="position: relative;left: -5px;">
+            <td class="infoStr" colspan="3">
+              <img class="iconTdImg" :src="IMG_HOST + data.skillAIcon"></img><span>{{data.skillAName}}</span>
+            </td>
+            <td colspan="3">
+              <img class="infoStr" src="../../resources/images/feh/Icon_Skill_Assist.png" />
+              <span>{{data.skillAssName}}</span>
+            </td>
+          </tr>
+          <tr style="position: relative;left: -5px;">
+            <td class="infoStr" colspan="3">
+              <img class="iconTdImg" :src="IMG_HOST + data.skillBIcon"></img><span>{{data.skillBName}}</span>
+            </td>
+            <td colspan="3">
+              <img class="infoStr" src="../../resources/images/feh/Icon_Skill_Special.png" />
+              <span>{{data.skillSpName}}</span>
+            </td>
+          </tr>
+          <tr style="position: relative;left: -5px;">
+            <td class="infoStr" colspan="3">
+              <img class="iconTdImg" :src="IMG_HOST + data.skillCIcon"></img><span>{{data.skillCName}}</span>
+            </td>
+            <td colspan="3">
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class="block">
+      <el-pagination 
+        v-model:current-page="pageNo" 
+        v-model:page-size="pageSize" 
+        :page-sizes="[6,9,15,30]" 
+        :page-size="pageSize" 
+        layout="total, sizes, prev, pager, next, jumper" 
+        :total="dataList.length"
+        @size-change="(val)=>{pageSize = val;pageNo=1}"
+        @current-change="(val)=>{pageNo = val}">
+      </el-pagination>
+      </div>
+    </div>
+
+    <!-- 详细dialog -->
+    <el-dialog :visible.sync="openDialogFlag" title="火纹英雄立绘" alt="Click" top="10px" width="900px">
+      <div id='activity' style='background:url(../../resources/images/backgound_v.jpg)no-repeat;height: 70rem;'>
+        <div id='sameHero'></div>
+        <div id='heroIllustration'>
+          <img v-if="openDialogFlag" :src="selectedData.stageImg[0]"/>
+        </div>
+        <!-- 面板 -->
+        <div id='heroStatusArea'>
+          <!-- 称号 名称 -->
+          <div id='titleArea'>
+          <label id="titleName">{{selectedData.titleName}}</label>
+          <label id="name">{{selectedData.nameCn}}</label>
+          </div>
+          
+          <!-- 属性 -->
+          <div class="textArea" style="margin-left: 7rem;position: relative;">
+            <div class="leftText" style="width:200px;display:inline-block;position: absolute;top: 19px;">
+              <div class="statusAndSkillRow">
+              <label class="value" id="hp">{{selectedData.hp}}</label>
+              </div>
+              <div class="statusAndSkillRow">
+              <label class="value" id="attact">{{selectedData.atk}}</label>
+              </div>
+              <div class="statusAndSkillRow">
+              <label class="value" id="speed">{{selectedData.spd}}</label>
+              </div>
+              <div class="statusAndSkillRow">
+              <label class="value" id="def">{{selectedData.def}}</label>
+              </div>
+              <div class="statusAndSkillRow">
+              <label class="value" id="mdf">{{selectedData.res}}</label>
+              </div>
+              <div class="statusAndSkillRow">
+              <label class="value" id="">9999</label>
+              </div>
+              <div class="statusAndSkillRow">
+              <label class="value" id="">6000</label>
+              </div>
+            </div>
+            
+            <div class="rightText" style="width:200px;display:inline-block;position: absolute;left: 220px;top: 19px;">
+              <div class="statusAndSkillRow">
+              <label class="value" id="weapon">{{selectedData.weaponName}}</label>
+              </div>
+              <div class="statusAndSkillRow">
+              <label class="value" id="skillS">{{selectedData.skillAssName}}</label>
+              </div>
+              <div class="statusAndSkillRow">
+              <label class="value" id="skillE">{{selectedData.skillSpName}}</label>
+              </div>
+              <div class="statusAndSkillRow">
+              <img :src="IMG_HOST + selectedData.skillAIcon" />
+              <label class="value" style="position: absolute;left: 0px;" id="skillA">{{selectedData.skillAName}}</label>
+              </div>
+              <div class="statusAndSkillRow">
+              <img :src="IMG_HOST + selectedData.skillBIcon" />
+              <label class="value" style="position: absolute;left: 0px;" id="skillB">{{selectedData.skillBName}}</label>
+              </div>
+              <div class="statusAndSkillRow">
+              <img :src="IMG_HOST + selectedData.skillCIcon" />
+              <label class="value" style="position: absolute;left: 0px;" id="skillC">{{selectedData.skillCName}}</label>
+              </div>
+              <div class="statusAndSkillRow">
+              <label class="value" id="skillD">{{selectedData.skillDName}}</label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </el-dialog>
+  </div>
+
+  <!-- Vue Js -->
+  <script>
+    new Vue({
+      el: '#app',
+      data: function () {
+        return {
+          IMG_HOST: result.data.config.imgUrl
+          , BASE_HREF: result.data.config.baseUrl
+          , dataList: result.data.dataList
+          , condition: {"heroType":"Legendary:传承"}
+          , nameList: {}
+          , pageSize: 9
+          , pageNo: 1
+          , selectedData: {}
+          , openDialogFlag: false
+        }
+      },
+      // 編集用データ
+      computed: {
+        displayList: function(){
+          let resultList = []
+          let start = (this.pageNo - 1) * this.pageSize
+          for(i = start; i < start + this.pageSize; i++) {
+            if (i < result.data.dataList.length) {
+              let data = result.data.dataList[i]
+              let mstData = result.data.skillDirt[data.imgName]
+              data["skillAIcon"] = mstData["skillAIcon"]
+              data["skillBIcon"] = mstData["skillBIcon"]
+              data["skillCIcon"] = mstData["skillCIcon"]
+              data["skillAName"] = mstData["skillAName"]
+              data["skillBName"] = mstData["skillBName"]
+              data["skillCName"] = mstData["skillCName"]
+              data["skillSpName"] = mstData["skillSpName"]
+              data["skillAssName"] = mstData["skillAssName"]
+              data["weaponIcon"] = mstData["weaponIcon"]
+              data["weaponName"] = mstData["weaponName"]
+              resultList.push(data)
+            }
+          }
+          return resultList
+        }
+      },
+      // 初期化処理
+      mounted() {
+        //this.pickData(this.displayList[3])
+      },
+      // 监听
+      watch: {
+      },
+      methods: {
+        pickData(data) {
+          this.selectedData = copyObject(data)
+          stageImgBox = JSON.parse(data.stageImg)
+          this.selectedData.stageImg = ['','','','']
+          this.selectedData.stageImg[0] = this.IMG_HOST + stageImgBox[0] + data.imgName + "_Face.webp"
+          this.selectedData.stageImg[1] = this.IMG_HOST + stageImgBox[1] + data.imgName + "_BtlFace.webp"
+          this.selectedData.stageImg[2] = this.IMG_HOST + stageImgBox[2] + data.imgName + "_BtlFace_C.webp"
+          this.selectedData.stageImg[3] = this.IMG_HOST + stageImgBox[3] + data.imgName + "_BtlFace_D.webp"
+          this.openDialogFlag = true
+        },
+        showMsg(messageStr) {
+          this.$notify.info({
+            title: '消息',
+            message: JSON.stringify(messageStr)
+          })
+        },
+      }
+    })
+  </script>
+</body>
+
+</html>
