@@ -43,7 +43,7 @@ tr> .faceImg:after {
   left: -5px;
   width: 110%;
   height: 110%;
-  background: url(faceBorder.png)no-repeat;
+  background: url(http://localhost:5173/01_feh/faceBorder.png)no-repeat;
   background-size: 100%;
 }
 

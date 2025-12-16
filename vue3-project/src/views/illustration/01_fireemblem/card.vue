@@ -2,18 +2,9 @@
 import "@/assets/feh/CardList.css"
 export default {
     props: {
-        data: {
-            type: Object,
-            required: true
-        },
-        IMG_HOST: {
-            type: String,
-            required: true
-        },
-        CODE_MASTER: {
-            type: Object,
-            required: true
-        }
+        data: {type: Object,required: true},
+        IMG_HOST: {type: String,required: true},
+        CODE_MASTER: {type: Object,required: true}
     },
     methods: {
         getDirection(codeList,code){
@@ -25,11 +16,12 @@ export default {
 <template>
     <div class="fehCard">
         <table>
+          <tbody>
           <tr>
             <td class="faceImg" rowspan="4">
               <img :src="IMG_HOST + data.faceImg + data.imgName.replace(/'/g,'') + '_Face_FC.webp'"></img>
               <div class="rarity">
-                <img class="rarityStar" v-for="n in parseInt(data.rarity)" src="@/assets/feh/Icon_Rarity_5.png">
+                <img class="rarityStar" v-for="n in parseInt(data.rarity)" src="http://localhost:5173/01_feh/Icon_Rarity_5.png">
               </div>
             </td>
             <td class="infoStr" colspan="5">
@@ -58,7 +50,7 @@ export default {
               <img class="iconTdImg" :src="IMG_HOST + data.skillAIcon"></img><span>{{data.skillAName}}</span>
             </td>
             <td colspan="3">
-              <img class="infoStr" src="@/assets/feh/Icon_Skill_Assist.png" />
+              <img class="infoStr" src="http://localhost:5173/01_feh/Icon_Skill_Assist.png" />
               <span>{{data.skillAssName}}</span>
             </td>
           </tr>
@@ -67,7 +59,7 @@ export default {
               <img class="iconTdImg" :src="IMG_HOST + data.skillBIcon"></img><span>{{data.skillBName}}</span>
             </td>
             <td colspan="3">
-              <img class="infoStr" src="@/assets/feh/Icon_Skill_Special.png" />
+              <img class="infoStr" src="http://localhost:5173/01_feh/Icon_Skill_Special.png" />
               <span>{{data.skillSpName}}</span>
             </td>
           </tr>
@@ -78,6 +70,7 @@ export default {
             <td colspan="3">
             </td>
           </tr>
+          </tbody>
         </table>
     </div>
 </template>

@@ -5,7 +5,7 @@ import loginComp from '../views/login.vue'
 import mainFrameComp from '../views/mainFrame.vue'
 import managementComp from '../views/management.vue'
 import systemConfComp from '../views/systemconf.vue'
-import fehCardComp from '../views/illustration/fireemblemHero.vue'
+import fehCardComp from '../views/illustration/01_fireemblem/fireemblemHero.vue'
 
 // 创建路由对象
 const router = createRouter({

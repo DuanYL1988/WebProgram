@@ -1,14 +1,12 @@
-/* 上方按钮区域 */
-#topBtnArea {
-  position: fixed;
-  margin: 2rem 0 0 2rem;
-  display: grid;
-  z-index: 9;
+.el-dialog__body {
+  background: url(http://localhost:5173/01_feh/backgound_v.jpg)no-repeat;
+  height: 70rem;
 }
 
 /* 立绘区域 */
 #heroIllustration {
   position: absolute;
+  top: 10rem;
 }
 
 #imgName {
@@ -16,15 +14,18 @@
 }
 
 /* 具体信息区域 */
-
 #heroStatusArea {
-  background: url(../../resources/images/bk_fe_board.png) no-repeat;
-    background-size: 40rem 36rem;
-    width: 100%;
-    height: 570px;
-    position: absolute;
-    margin-top: 33rem;
-    margin-left: 8rem;
+  background: url(http://localhost:5173/01_feh/bk_fe_board.png) no-repeat;
+  background-size: 40rem 36rem;
+  width: 100%;
+  height: 570px;
+  position: absolute;
+  bottom: 0px;
+  left: 5rem
+}
+
+#heroIllustration>.el-image {
+  bottom: -60px;
 }
 
 /* 称号和名称区域 */
@@ -49,7 +50,7 @@
   height: 2.5rem;
   font-size: 1.1rem;
   position: relative;
-  width:35rem
+  width: 35rem
 }
 
 /* 值 */
@@ -70,15 +71,54 @@
   left: 30rem;
 }
 
-#heroIllustration>img{
+#heroIllustration>img {
   width: 100%;
 }
 
-.statusAndSkillRow>img{
-	width:35px;
-	height:35px
+.statusAndSkillRow>img {
+  width: 35px;
+  height: 35px
 }
 
-.statusAndSkillRow>img,.statusAndSkillRow>label{
-	display:inline-block
+.statusAndSkillRow>img,
+.statusAndSkillRow>label {
+  display: inline-block
+}
+
+/* 按钮部分 */
+.cntlBtn {
+  position: absolute;
+  opacity: 0.7;
+  width: 80px;
+  height: 80px;
+  z-index: 100
+}
+
+.preBckBtn {
+  top: 50%
+}
+
+.cntlBtn>img {
+  width: 100%;
+  height: 100%;
+}
+
+.cntlBtn:hover {
+  transform: translateY(-2px) scale(1.01);
+  opacity: 1;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #ccc;
+  border-top-color: #3498db;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }

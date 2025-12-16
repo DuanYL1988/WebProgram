@@ -31,15 +31,6 @@ onMounted(async function(){
                 </el-menu-item>
             </template>
         </el-sub-menu>
-        <el-sub-menu index="`pmenu99">
-            <template #title>
-                <el-icon></el-icon>
-                <span>Test</span>
-            </template>
-            <el-menu-item>
-                <router-link to="/mainFrame/management/FIREEMBLEM_HERO">Firemenblem121</router-link>
-            </el-menu-item>
-        </el-sub-menu>
     </el-menu>
     
     </div>

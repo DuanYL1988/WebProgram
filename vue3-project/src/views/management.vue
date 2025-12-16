@@ -3,8 +3,8 @@ import SearchComp from "@/components/searchComp.vue"
 import FaceTdComp from "@/elementComp/faceTdComp.vue"
 import TagTdComp from "@/elementComp/tagTdComp.vue";
 import Utils from "@/utils/request";
+
 export default {
-  components: {SearchComp,FaceTdComp,TagTdComp},
   data() {
     return {
       tableName: this.$route.params.tablename,
@@ -15,6 +15,10 @@ export default {
       actionTdWidth:150,
       idValMp:{}
     };
+  },
+  components: {SearchComp,FaceTdComp,TagTdComp},
+  props: {
+    tableName: {type: String, required: true}
   },
   /* 初始化 */
   mounted(){
@@ -69,8 +73,9 @@ export default {
         console.debug("cond:" + JSON.stringify(searchCondition))
         let response = await Utils.request.post(url, searchCondition);
         if(200 == response?.code){
-          this.searchDataList = response.data
+          this.searchDataList = response.data.dataList
           this.pageNo=1
+          console.log("Result Size:" + response.data)
         }
       }
     },
@@ -126,7 +131,7 @@ export default {
               </el-table-column>
               <TagTdComp v-else-if="'tag'== column.colInputtype" :label="column.colNameCh" :prop="column.colCamel" />
               <el-table-column v-else :width="column.colListWidth" :label="column.colNameCh">
-                  <template #default="scope">{{scope.row[column.colCamel]}}</template>
+                  <template #default="scope" show-overflow-tooltip>{{scope.row[column.colCamel]}}</template>
               </el-table-column>
           </template>
           <el-table-column :width="actionTdWidth" fixed="right" label="操作">

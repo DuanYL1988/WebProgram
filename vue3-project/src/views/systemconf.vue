@@ -5,7 +5,7 @@ import SwitchTd from '../elementComp/switchTdComp.vue'
 import InputTd from '../elementComp/inputTdComp.vue'
 
 var tableList = ref([])
-var tblCond = ref({"tableName":"FGO_SERVANT", "colFifterable":"", "colListDisableFlag":""})
+var tblCond = ref({"tableName":"", "colFifterable":"", "colListDisableFlag":""})
 var columnList = ref([])
 var updateColMp = ref({})
 const COLUMN_MP = {
@@ -40,6 +40,7 @@ function showColumnsInfo(){
 
 function changeColVal(row,prop){
     let tempMp = updateColMp.value
+    console.debug("changeColVal:" + prop + "=" + row[prop])
     if (isEmpty(tempMp[prop])) {
         tempMp[prop] = {
             "tgtColNm": COLUMN_MP[prop]
@@ -93,7 +94,7 @@ function updateRows(){
             <el-table-column prop="colInputtype" width="100" label="输入类型"/>
             <SwitchTd prop="colFifterable" label="检索条件flag" :width="120" @switch-change="changeColVal"/>
             <InputTd prop="colCode" label="MASTER_CODE" :width="130" numberFlag="False" @input-mouseout="changeColVal" />
-            <SwitchTd prop="colListDisableFlag" label="一览表示flag" :width="120" />
+            <SwitchTd prop="colListDisableFlag" label="一览表示flag" :width="120" @switch-change="changeColVal"/>
             <InputTd prop="colListWidth" label="一览宽度" :width="150" :step="10" numberFlag="True" @input-mouseout="changeColVal" />
             <InputTd prop="colSort" label="排序" :width="120" :step="1" numberFlag="True" @input-mouseout="changeColVal" />
         </el-table>

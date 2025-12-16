@@ -8,7 +8,7 @@ const faceImg = userInfo
     <div id="topMenu">
         <span class="title"></span>
         <div id="faceImg">
-            <img class="faceImg" :src="faceImg"/>
+            <img class="faceImg" style="width: 90px; height: 90px; border-radius: 50px;" :src="faceImg"/>
         </div>
     </div>
 </template>
@@ -24,6 +24,6 @@ const faceImg = userInfo
     position: relative;
     float: right;
     top: 10px;
-    right: 20px
+    right: 20px;
 }
 </style>
