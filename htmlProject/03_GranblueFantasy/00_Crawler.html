@@ -50,7 +50,8 @@
         
         /** 初始化单个图像元素 */
         function setGalleryDiv(galleryDiv, data) {
-            $(galleryDiv).find("img").attr("src", BASE_IMG_DIR + "/" + data.name + "_" + data.no + "/faceIcon2.jpg")
+            //$(galleryDiv).find("img").attr("src", BASE_IMG_DIR + "/" + data.name + "_" + data.no + "/faceIcon2.jpg")
+			$(galleryDiv).find("img").attr("src", IMG_HOST + data.faceImg2)
             $(galleryDiv).find("h3").html(data.title + " : " + data.nameAttr)
         }
 

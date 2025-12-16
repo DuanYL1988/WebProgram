@@ -1,3 +1,7 @@
+.el-dialog__body{
+	background:url(https://photogzmaz.photo.store.qq.com/psc?/V51v220v2C0E493HVi1R4bhVpB463LUx/LiySpxowE0yeWXwBdXN*SV*JO1iK59erT*CTce2NpxhrWTDYZAJZnNVXantZL19RtrIbi9rdFOW4vJouxxilVjBmB2Apt16KmXnBM6yNqvY!/b&bo=hAOdB4QDnQcBFzA!&rf=viewer_4)no-repeat;height: 75rem;'
+}
+
 /* 上方按钮区域 */
 #topBtnArea {
   position: fixed;
@@ -16,15 +20,18 @@
 }
 
 /* 具体信息区域 */
-
 #heroStatusArea {
-  background: url(../../resources/images/bk_fe_board.png) no-repeat;
+  background: url(https://photogzmaz.photo.store.qq.com/psc?/V51v220v2C0E493HVi1R4bhVpB463LUx/LiySpxowE0yeWXwBdXN*SXqo2vfyp*TIHax1Iav312GpE8JRGCX4aJ0ICOwb3ievNdoDzmBiBqKuEqaNYATveltdLNUwKJnOaykZtQMaFdA!/b&bo=kgR3BJIEdwQDNxI!&rf=viewer_4) no-repeat;
     background-size: 40rem 36rem;
     width: 100%;
     height: 570px;
     position: absolute;
     margin-top: 33rem;
     margin-left: 8rem;
+}
+
+#heroIllustration>.el-image{
+	bottom: -60px;!important
 }
 
 /* 称号和名称区域 */
@@ -81,4 +88,39 @@
 
 .statusAndSkillRow>img,.statusAndSkillRow>label{
 	display:inline-block
+}
+
+/* 按钮部分 */
+.cntlBtn {
+	position:absolute;
+	opacity:0.7;
+	width:80px;height:80px;
+	z-index:1
+}
+
+.preBckBtn{
+	top:50%
+}
+
+.cntlBtn > img{
+	width:100%;
+	height:100%;
+}
+
+.cntlBtn:hover{
+    transform: translateY(-2px) scale(1.01);
+	opacity:1;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #ccc;
+  border-top-color: #3498db;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }

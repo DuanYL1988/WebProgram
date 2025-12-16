@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-
 <head>
   <meta charset="UTF-8">
   <link rel="shortcut icon" href="../../resources/images/feh/PageIcon.png">
@@ -101,17 +100,29 @@
 
     <!-- 详细dialog -->
     <el-dialog :visible.sync="openDialogFlag" title="火纹英雄立绘" alt="Click" top="10px" width="900px">
-      <div id='activity' style='background:url(../../resources/images/backgound_v.jpg)no-repeat;height: 70rem;'>
+      <div id='activity' >
         <div id='sameHero'></div>
+		<div class="cntlBtn" style="padding:10px;" @click="showDetailFlag=!showDetailFlag">
+			<img src="../../resources/images/btn-show.png"/>
+		</div>
+		<div class="changeBtn" v-if="!showDetailFlag">
+			<div class="cntlBtn preBckBtn" style="padding:10px;" @click="imgIndex=imgIndex-1">
+				<img src="../../resources/images/btn-back.png"/>
+			</div>
+			<div class="cntlBtn preBckBtn" style="padding:10px;left:90%;transform: rotate(180deg);" @click="imgIndex+=1">
+				<img src="../../resources/images/btn-back.png"/>
+			</div>
+		</div>
         <div id='heroIllustration'>
-          <img v-if="openDialogFlag" :src="selectedData.stageImg[0]"/>
+			<!-- <div class="spinner" v-if="loading"></div> -->
+			<el-image v-if="openDialogFlag" :src="selectedData.stageImg[imgIndex]" lazy fit="cover" />
         </div>
         <!-- 面板 -->
-        <div id='heroStatusArea'>
+        <div id='heroStatusArea' v-if="showDetailFlag">
           <!-- 称号 名称 -->
           <div id='titleArea'>
-          <label id="titleName">{{selectedData.titleName}}</label>
-          <label id="name">{{selectedData.nameCn}}</label>
+			  <label id="titleName">{{selectedData.titleName}}</label>
+			  <label id="name">{{selectedData.nameCn}}</label>
           </div>
           
           <!-- 属性 -->
@@ -185,7 +196,9 @@
           , nameList: {}
           , pageSize: 9
           , pageNo: 1
+		  , imgIndex: 0
           , selectedData: {}
+		  , showDetailFlag: false
           , openDialogFlag: false
         }
       },
@@ -216,10 +229,22 @@
       },
       // 初期化処理
       mounted() {
-        //this.pickData(this.displayList[3])
+        this.pickData(this.displayList[3])
       },
       // 监听
       watch: {
+		imgIndex:function(newVal,oldVal) {
+			if (newVal >= this.selectedData.stageImg.length) {
+				this.imgIndex = 0
+			} else if (newVal<0) {
+				this.imgIndex = 3
+			}
+		},
+		selectedData:function(newVal,oldVal) {
+			if (newVal["id"] !== oldVal["id"]) {
+				this.imgIndex = 0
+			}
+		}
       },
       methods: {
         pickData(data) {
@@ -231,12 +256,6 @@
           this.selectedData.stageImg[2] = this.IMG_HOST + stageImgBox[2] + data.imgName + "_BtlFace_C.webp"
           this.selectedData.stageImg[3] = this.IMG_HOST + stageImgBox[3] + data.imgName + "_BtlFace_D.webp"
           this.openDialogFlag = true
-        },
-        showMsg(messageStr) {
-          this.$notify.info({
-            title: '消息',
-            message: JSON.stringify(messageStr)
-          })
         },
       }
     })

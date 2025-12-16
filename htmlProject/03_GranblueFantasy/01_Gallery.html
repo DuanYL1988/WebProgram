@@ -143,7 +143,9 @@
                     let data = this.selectItem
                     if(null !== data) {
                         $.each(this.selectItem.illImgs,(index, img)=>{
-                            imgBox.push(BASE_IMG_DIR + data.name + "_" + data.no + "/" + data.no + "_0" + (index+1) + ".png")
+                            //imgBox.push(BASE_IMG_DIR + data.name + "_" + data.no + "/" + data.no + "_0" + (index+1) + ".png")
+							imgBox.push(IMG_HOST + data.faceImgSrc)
+							faceImgSrc
                         })
                     }
                     return imgBox
@@ -159,7 +161,8 @@
                         
                         // 结果
                         if(addFlag) {
-                            data["localSrc"] = BASE_IMG_DIR + data.name + "_" + data.no + "/faceIcon.jpg"
+                            // data["localSrc"] = BASE_IMG_DIR + data.name + "_" + data.no + "/faceIcon.jpg"
+							data["localSrc"] = IMG_HOST + data.faceImgSrc
                             data["pickFlag"] = true
                             result.push(data)
                         }
