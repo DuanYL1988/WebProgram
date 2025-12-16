@@ -118,7 +118,7 @@ export default {
   <div v-if="searchDataList.length > 0" style="height:80%;" class="block">
     <div style="max-height:90%;overflow-y:scroll">
       <el-table :style="{'width':tableWidth}" :data="displayList" border stripe >
-          <FaceTdComp :tableName="tableName" :baseUrl="result.config.imgUrl" />
+          <FaceTdComp :tableName="$route.params.tablename" :baseUrl="result.config.imgUrl" />
           <!-- 通用一览表示 -->
           <template v-for="column in result.listColumns">
               <el-table-column v-if="'select'== column.colInputtype || 'radio'== column.colInputtype" :width="column.colListWidth" :label="column.colNameCh" :key="`colTd`+column.colCamel">
