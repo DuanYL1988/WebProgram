@@ -1,17 +1,20 @@
+.el-body {
+  padding: 8px!important;
+}
+
 .el-dialog__body {
   background: url(http://localhost:5173/01_feh/backgound_v.jpg)no-repeat;
-  height: 70rem;
+  height: 65rem;
 }
 
 /* 立绘区域 */
 #heroIllustration {
   position: absolute;
-  top: 10rem;
+  top: 6rem;
+  left: -10px;
 }
 
-#imgName {
-  height: 70rem;
-}
+
 
 /* 具体信息区域 */
 #heroStatusArea {
@@ -20,12 +23,8 @@
   width: 100%;
   height: 570px;
   position: absolute;
-  bottom: 0px;
+  bottom: 15px;
   left: 5rem
-}
-
-#heroIllustration>.el-image {
-  bottom: -60px;
 }
 
 /* 称号和名称区域 */

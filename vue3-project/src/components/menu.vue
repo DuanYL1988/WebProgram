@@ -7,6 +7,7 @@ onMounted(async function(){
     let result = await Utils.request.post("/getMenuList");
     if(200 == result?.code){
         menuList.value = result.data["menuGroup"]
+        console.debug(menuList.value)
     }
 })
 </script>
@@ -28,19 +29,15 @@ onMounted(async function(){
             <span class="group-title">{{ groupName }}</span>
           </template>
 
-          <el-menu-item
-            v-for="(menu, midx) in childList"
-            :key="menu.id ?? (`${gidx}-${midx}`)"
-            :index="`/mainFrame${menu.vueUrl}`"
-            class="menu-item"
-          >
-            <router-link :to="`/mainFrame${menu.vueUrl}`" class="menu-link">
-              <img v-if="menu.icon" :src="menu.icon" class="menu-icon" alt="" />
-              <i v-else class="el-icon-menu fallback-icon" aria-hidden="true"></i>
-              <span class="menu-name">{{ menu.menuName }}</span>
-              <el-badge v-if="menu.badge" :value="menu.badge" class="menu-badge" />
-            </router-link>
-          </el-menu-item>
+          <template v-for="(menu, midx) in childList" :index="`/mainFrame${menu.vueUrl}`" :key="menu.id ?? (`${gidx}-${midx}`)">
+              <el-menu-item v-if="menu.disableFlag == `1`" class="menu-item">
+                <router-link :to="`/mainFrame${menu.vueUrl}`" class="menu-link" >
+                  <img v-if="menu.icon" :src="menu.icon" class="menu-icon" alt="" />
+                  <i v-else class="el-icon-menu fallback-icon" aria-hidden="true"></i>
+                  <span class="menu-name">{{ menu.menuName }}</span>
+                </router-link>
+              </el-menu-item>
+          </template>
         </el-sub-menu>
       </template>
     </el-menu>

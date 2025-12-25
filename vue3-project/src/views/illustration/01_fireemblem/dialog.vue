@@ -9,13 +9,17 @@ const props = defineProps({
 const { selectedData, IMG_HOST } = toRefs(props)
 const showDetailFlag = ref(false)
 const imgIndex = ref(0)
-console.debug(JSON.stringify(selectedData.value.stageImg))
 
 watch(imgIndex, (newVal) => {
-    console.debug("imgIndex changed to " + selectedData)
-    if(newVal < 0) {
+    if (newVal < 0) {
         imgIndex.value = selectedData.value.stageImg.length - 1
-    } else if(newVal >= selectedData.value.stageImg.length) {
+    } else if (newVal >= selectedData.value.stageImg.length) {
+        imgIndex.value = 0
+    }
+})
+
+watch(selectedData, (newVal, oldVal) => {
+    if(newVal.id !== oldVal.id) {
         imgIndex.value = 0
     }
 })
@@ -36,7 +40,7 @@ watch(imgIndex, (newVal) => {
             </div>
         </div>
         <div id='heroIllustration'>
-            <img :src="selectedData.stageImg[imgIndex]" />
+            <el-image :src="selectedData.stageImg[imgIndex]" lazy fit="cover" />
         </div>
         <!-- 面板 -->
         <div id='heroStatusArea' v-if="showDetailFlag">

@@ -1,6 +1,13 @@
 <script setup>
+import { ref } from 'vue'
+const showMenu = ref(false)
 const userInfo = localStorage.getItem("userinfo")
 const faceImg = userInfo
+
+function toggleMenu() {
+  showMenu.value = !showMenu.value
+}
+
 function logout() {
   // 这里放登出逻辑
   console.log('logout')
@@ -13,10 +20,7 @@ function logout() {
   <header class="app-header">
     <div class="left">
       <div class="logo">FE</div>
-      <div class="brand">
-        <div class="title">管理面板</div>
-        <div class="subtitle">控制与监控中心</div>
-      </div>
+
     </div>
 
     <div class="center">
@@ -87,8 +91,6 @@ function logout() {
   box-shadow: 0 8px 26px rgba(59,130,246,0.12);
   font-size:18px;
 }
-.brand .title { font-weight:700; font-size:16px; color:#f8fbff }
-.brand .subtitle { font-size:14px; color: #9fc3ea; margin-top:2px }
 
 /* center search */
 .center { flex:1; display:flex; justify-content:center; }

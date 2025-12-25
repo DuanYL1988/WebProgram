@@ -8,7 +8,7 @@ export default {
       userList:[],
       user: {
         username: "admin",
-        password: "1",
+        password: "Saber@74189632",
         telphone: "",
       },
       errormessage: "",
@@ -158,8 +158,7 @@ export default {
 /* 表单风格覆盖 Element 默认以适配暗色背景 */
 ::v-deep(.el-input__inner) {
   background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.06);
-  color: #e6eef8;
+  border: 1px solid rgba(226, 214, 214, 0.082);
 }
 ::v-deep(.el-input__inner::placeholder) {
   color: rgba(230,238,248,0.45);
